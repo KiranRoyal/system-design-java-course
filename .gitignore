@@ -18,3 +18,7 @@
 # Distribution archives are generated outside this repository
 *.zip
 *.bundle
+
+# Temporary Microsoft Word and LibreOffice lock files
+.~*
+~$*
