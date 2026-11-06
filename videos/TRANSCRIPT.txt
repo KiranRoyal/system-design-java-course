@@ -1,0 +1,41 @@
+Original narrated slide walkthrough. Voice: synthesized with eSpeak NG. Subtitle timing is approximate.
+
+01 Start with the requirement
+Start 0.0 seconds
+Welcome to System Design with Java. This sample walks through the learning package using small, inspectable examples. Begin with requirements, not a list of technologies. For checkout, ask what a customer can do, how much traffic to expect, and which rules must always remain true. One logical checkout should create one order. A timeout should not cause a second charge. The course develops these ideas from a single process to distributed workflows. The supplied code is for learning, and advanced production integrations are exercises.
+
+02 Estimate demand before capacity
+Start 36.6 seconds
+Run the capacity lab. One million daily users making twenty requests each produce about two hundred thirty one requests per second on average. Assuming a tenfold peak gives about two thousand three hundred fifteen. With a mean total response time of two hundred milliseconds, Little’s Law gives about four hundred sixty three requests in flight in a stable system. These are estimates under stated assumptions. They do not tell you how many servers you need until you measure what each server and its dependencies can handle.
+
+03 Cache reads with an expiry policy
+Start 70.2 seconds
+Run the cache lab. The first read returns a stored price. At the five second expiry boundary, the same lookup returns null. The test advances a fake monotonic clock, so it does not need to sleep. Read TtlCache dot java to see a bounded, synchronized least recently used cache. A production cache also needs a plan for concurrent misses, stale data, and invalidation across replicas. Never assume that a fast cached value is authoritative enough for every business decision.
+
+04 Limit rate and protect finite resources
+Start 103.2 seconds
+The token bucket starts with three tokens and refills at two per second. Three immediate requests succeed, and the fourth is rejected. After half a second, one token is available again. The synchronized method makes refill and consumption atomic inside one Java process. Four replicas with independent buckets do not enforce one shared customer quota. To extend the example, define tenant-scoped keys, an atomic shared operation, and the behavior when the quota store is unavailable.
+
+05 Place keys with consistent hashing
+Start 136.8 seconds
+Run the hashing lab. It assigns ten thousand keys to three nodes, adds a fourth node, and counts changed owners. Virtual nodes help spread placement, but the result is not perfectly balanced and a popular key can still be hot. The test verifies that keys moved by adding D now belong to D. This code is only a routing model. A real resharding operation must also copy data, handle writes during movement, transfer ownership safely, and verify that nothing was lost.
+
+06 Observe replica lag
+Start 168.9 seconds
+The replication lab writes one item, copies it to a follower, and then updates the leader to two items. A follower read is stale. A read-your-writes helper requires a minimum version and falls back to the leader. Later, an old delivery is ignored rather than overwriting a newer value. This is a deterministic in-memory model, not a consensus implementation. In a real system, you must also decide what to do when the leader cannot be reached and the follower is behind.
+
+07 Make retries preserve one intent
+Start 199.2 seconds
+A client can time out after the server commits an order but before receiving the reply. The next attempt must reuse the same logical checkout key. OrderStore records the order, the key, and an outbox event inside one synchronized operation. A matching retry returns the same order. A different amount with that key is rejected. The core tests run one hundred concurrent attempts and verify one order and one event. All of this state is in memory, so a durable database is the next extension.
+
+08 Expect duplicate event delivery
+Start 232.9 seconds
+Run the outbox lab. The consumer applies an event, but the relay is treated as interrupted before acknowledgement. The same event is delivered again, and the toy effect count remains one. Notice the boundary: consumer memory stays alive. This does not prove crash-safe exactly-once behavior. A durable consumer needs its event identifier and database effect in the same transaction. External providers need their own idempotency and reconciliation design. Always say exactly which effect and failure model a guarantee covers.
+
+09 Stop failure from amplifying load
+Start 269.2 seconds
+The circuit breaker opens after two failures and rejects the next call. After cooldown, one successful probe closes it. A generation number prevents a late result from an older call from closing a newer open state. The tests also check that only one recovery probe runs. A breaker does not impose a timeout by itself. Combine bounded calls with retry budgets, jitter, and admission control. Virtual threads make waiting cheaper, but they do not create database connections or provider capacity.
+
+10 Run, explain, then extend
+Start 303.3 seconds
+Start with the build script, run all ten labs, and inspect the source beside the guide. The full test script also checks the HTTP capstone on your machine. During package creation, thirty core checks passed, while the environment blocked listening sockets, so network integration was not run. The guide contains twenty four modules and eight design cases, plus video links for deeper study. Your final project adds durable storage, a real event pipeline, authorization, observability, and measured recovery. Explain what each test proves and what remains an assumption.

@@ -1,0 +1,444 @@
+{
+  "info": {
+    "name": "System Design Java Course",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run against the local JDK teaching server. No credentials or external calls. Derived from openapi.json; curated order tests retries and deletion. Disable redirect following. Run from the first request."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:18080"
+    },
+    {
+      "key": "runKey",
+      "value": "replace-by-prerequest-script"
+    },
+    {
+      "key": "linkId",
+      "value": ""
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Health and new test key",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/health"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set(\"runKey\", pm.variables.replaceIn(\"{{$guid}}\"));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"ready\", () => pm.expect(pm.response.json().status).to.eql(\"UP\"));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "02 Create link",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain"
+          }
+        ],
+        "url": "{{baseUrl}}/links",
+        "body": {
+          "mode": "raw",
+          "raw": "https://example.com/guide"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 201\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set(\"linkId\", pm.response.json().id);",
+              "pm.test(\"stored URL\", () => pm.expect(pm.response.json().url).to.eql(\"https://example.com/guide\"));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "03 Resolve link without following redirect",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/r/{{linkId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 302\", () => pm.response.to.have.status(302));",
+              "pm.test(\"target\", () => pm.expect(pm.response.headers.get(\"Location\")).to.eql(\"https://example.com/guide\"));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "04 Resolve again to exercise cache",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/r/{{linkId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 302\", () => pm.response.to.have.status(302));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "05 Create order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runKey}}"
+          }
+        ],
+        "url": "{{baseUrl}}/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "12500"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 201\", () => pm.response.to.have.status(201));",
+              "pm.collectionVariables.set(\"orderId\", pm.response.json().id);",
+              "pm.test(\"new order\", () => pm.expect(pm.response.json().replayed).to.eql(false));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "06 Retry the same logical order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runKey}}"
+          }
+        ],
+        "url": "{{baseUrl}}/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "12500"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"same order\", () => pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get(\"orderId\")));",
+              "pm.test(\"replay\", () => pm.expect(pm.response.json().replayed).to.eql(true));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "07 Reject conflicting key reuse",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "{{runKey}}"
+          }
+        ],
+        "url": "{{baseUrl}}/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "12600"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 409\", () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "08 Read stored order",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/orders/{{orderId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"amount\", () => pm.expect(pm.response.json().amountCents).to.eql(12500));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "09 Dispatch local outbox",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/admin/dispatch"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"at least one delivery\", () => pm.expect(pm.response.json().delivered).to.be.at.least(1));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "10 Dispatch again without new work",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/admin/dispatch"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"no new deliveries\", () => pm.expect(pm.response.json().delivered).to.eql(0));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "11 Delete link",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/links/{{linkId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 204\", () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "12 Deleted link cannot come from cache",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/r/{{linkId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "13 Invalid URL scheme",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain"
+          }
+        ],
+        "url": "{{baseUrl}}/links",
+        "body": {
+          "mode": "raw",
+          "raw": "javascript:alert(1)"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "14 Missing idempotency key",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain"
+          }
+        ],
+        "url": "{{baseUrl}}/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "12500"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    },
+    {
+      "name": "15 Metrics are readable",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/metrics"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"status 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"counters present\", () => { const m = pm.response.json(); pm.expect(m.orders).to.be.at.least(1); pm.expect(m.cacheHits).to.be.at.least(1); });"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "followRedirects": false
+      }
+    }
+  ]
+}

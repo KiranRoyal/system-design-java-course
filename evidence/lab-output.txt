@@ -1,0 +1,49 @@
+
+--- capacity ---
+Average 231.48 req/s; 10x peak 2314.81 req/s
+At mean 200 ms, peak in-flight 463 requests
+10 million 500-byte rows/day = 5.0 GB/day raw, before replicas/indexes.
+
+--- cache ---
+Hit: price=100
+At expiry: null
+hits=1 misses=1
+
+--- limiter ---
+Request 0 allowed=true
+Request 1 allowed=true
+Request 2 allowed=true
+Request 3 allowed=false
+After 0.5 s allowed=true
+
+--- hashing ---
+Keys moved after adding D: 2410 / 10000 (distribution is not exact)
+
+--- breaker ---
+IOException state=CLOSED
+IOException state=OPEN
+Rejected state=OPEN
+Recovery probe: OK state=CLOSED
+
+--- outbox ---
+Same order on retry=true
+Simulated crash AFTER effect, BEFORE acknowledgement
+Effects after duplicate delivery=1
+This simulates relay interruption; consumer process/state did NOT restart.
+
+--- replication ---
+Stale follower=Value[version=1, data=one item]
+Read-your-writes=Value[version=2, data=two items]
+Old delivery cannot overwrite newer version=Value[version=2, data=two items]
+
+--- bloom ---
+Known key=true; false positives=72/10000
+
+--- queue ---
+Offer 1=true offer 2=true offer 3=false
+Consume=1; retry offer 3=true
+Capacity bounds memory. A failed offer needs reject, delay, or durable retry policy.
+
+--- bulkhead ---
+Maximum simultaneous work=3 despite 20 virtual threads
+Production callers also need bounded waiting/deadlines; use tryAcquire at ingress.

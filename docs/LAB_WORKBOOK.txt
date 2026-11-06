@@ -1,0 +1,85 @@
+JAVA LAB WORKBOOK
+Run commands from the extracted course root after sh scripts/build.sh.
+
+1. CAPACITY
+Command: java -cp build/classes course.Labs capacity
+Observe: average about 231.48 req/s, 10x peak 2314.81, and about 463 in flight at a mean 200 ms. Raw storage example is 5 GB/day.
+Change: requests per user from 20 to 50. Predict all numbers before running.
+Pass: explain why this does not tell you an exact instance count or p99 latency.
+
+2. CACHE
+Command: java -cp build/classes course.Labs cache
+Observe: price=100 before expiry and null at the five-second TTL boundary; one hit and one miss.
+Read: TtlCache.java. The access-order LinkedHashMap implements local LRU. get() is synchronized because a read changes access order.
+Change: add three keys to a two-entry cache; read the first before adding the third.
+Pass: predict which key is evicted and explain expiry versus capacity eviction.
+
+3. RATE LIMITER
+Command: java -cp build/classes course.Labs limiter
+Observe: true, true, true, false; after half a second at two tokens per second, true.
+Change: capacity to one and refill to four. Advance the fake clock by 249 and 250 milliseconds.
+Pass: reject concurrent requests beyond the quota without sleeping in the test.
+Limit: each instance has its own budget. A Redis/distributed implementation is an extension.
+
+4. HASHING
+Command: java -cp build/classes course.Labs hashing
+Observe: only some of 10,000 keys change owners after D joins. The exact result is printed.
+Change: virtual nodes from 128 to 1 and compare per-node counts. Remove D.
+Pass: explain why a key that moves after adding D must move to D, and why this does not move stored data.
+
+5. CIRCUIT BREAKER
+Command: java -cp build/classes course.Labs breaker
+Observe: two IOException failures, then Rejected with OPEN state; after cooldown a successful probe returns to CLOSED.
+Read: CircuitBreaker.java and the stale-success and single-probe tests.
+Change: make the probe fail, advance time, then allow recovery.
+Pass: a late result from an older generation must not close the new open state.
+Limit: call() does not enforce a timeout; a blocked action requires caller-side deadlines.
+
+6. IDEMPOTENCY AND OUTBOX
+Command: java -cp build/classes course.Labs outbox
+Observe: retry returns the same order; duplicate delivery leaves one toy effect.
+Change: reuse the checkout key with a different amount and observe Conflict.
+Pass: draw the crash window after publication before relay acknowledgement.
+Limit: the simulation preserves consumer memory and does not model durable restart. All state is lost when the JVM exits.
+
+7. REPLICATION
+Command: java -cp build/classes course.Labs replication
+Observe: follower shows one item after leader has two; read-your-writes returns two; delayed older delivery is ignored.
+Change: remove the fallback and show the user's stale view.
+Pass: explain which consistency guarantee is demonstrated and what happens if the leader is unavailable.
+Limit: no real network, leader election, quorum protocol, or persistent log is implemented.
+
+8. BLOOM FILTER
+Command: java -cp build/classes course.Labs bloom
+Observe: known key is present; some absent keys may produce false positives.
+Change: bit count from 10,000 to 2,000 and compare false positives.
+Pass: never use a positive Bloom result as proof of existence. Explain why ordinary bit-clearing deletion is unsafe.
+
+9. BOUNDED QUEUE
+Command: java -cp build/classes course.Labs queue
+Observe: first two offers succeed, third fails, then succeeds after one consume.
+Change: compare offer() with a timed offer() and define what the caller does after timeout.
+Pass: calculate how quickly backlog grows when arrival exceeds service rate.
+Limit: this is in-memory ArrayBlockingQueue, not a durable broker.
+
+10. BULKHEAD
+Command: java -cp build/classes course.Labs bulkhead
+Observe: no more than three tasks enter protected work despite twenty virtual threads.
+Change: reduce permits to one, then compare completion time.
+Pass: explain why cheap waiting threads do not create database capacity. Add bounded admission rather than an unlimited waiting queue.
+
+HTTP CAPSTONE
+Command: sh scripts/run.sh 18080
+Run the Postman collection in order or use curl examples in README.md.
+Trace create link -> first redirect cache miss -> second redirect cache hit -> delete -> 404.
+Trace create order -> same-key retry -> changed-amount conflict -> dispatch -> second dispatch with no new effects.
+Then restart the process and explain exactly what was lost.
+
+DEEP EXTENSIONS
+A. PostgreSQL: implement sql/reference.sql with JDBC in a disposable database. Prove restart persistence and concurrent uniqueness.
+B. Redis: move quotas to atomic shared state, then explain regional guarantees and outage policy.
+C. Kafka: publish durable outbox events and atomically deduplicate consumer database effects. Prove interruption recovery.
+D. Framework: port the HTTP contract to a maintained Java framework without changing behavior. Compare the same tests against both versions.
+E. Operations: add an SLO, trace propagation, controlled load test, migration, and restore exercise. Report measured results and limitations.
+
+Do not describe extensions as completed until implemented and verified. The package's evidence folder records only the checks actually run during creation.

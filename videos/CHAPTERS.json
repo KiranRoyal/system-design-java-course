@@ -1,0 +1,72 @@
+[
+  {
+    "number": "01",
+    "title": "Start with the requirement",
+    "duration": 36.58916099773243,
+    "start": 0,
+    "file": "01_start_with_the_requirement.mp4"
+  },
+  {
+    "number": "02",
+    "title": "Estimate demand before capacity",
+    "duration": 33.601133786848074,
+    "start": 36.58916099773243,
+    "file": "02_estimate_demand_before_capacity.mp4"
+  },
+  {
+    "number": "03",
+    "title": "Cache reads with an expiry policy",
+    "duration": 33.050929705215424,
+    "start": 70.1902947845805,
+    "file": "03_cache_reads_with_an_expiry_policy.mp4"
+  },
+  {
+    "number": "04",
+    "title": "Limit rate and protect finite resources",
+    "duration": 33.529115646258504,
+    "start": 103.24122448979593,
+    "file": "04_limit_rate_and_protect_finite_resources.mp4"
+  },
+  {
+    "number": "05",
+    "title": "Place keys with consistent hashing",
+    "duration": 32.151156462585035,
+    "start": 136.77034013605441,
+    "file": "05_place_keys_with_consistent_hashing.mp4"
+  },
+  {
+    "number": "06",
+    "title": "Observe replica lag",
+    "duration": 30.24734693877551,
+    "start": 168.92149659863946,
+    "file": "06_observe_replica_lag.mp4"
+  },
+  {
+    "number": "07",
+    "title": "Make retries preserve one intent",
+    "duration": 33.695510204081636,
+    "start": 199.16884353741497,
+    "file": "07_make_retries_preserve_one_intent.mp4"
+  },
+  {
+    "number": "08",
+    "title": "Expect duplicate event delivery",
+    "duration": 36.372018140589574,
+    "start": 232.86435374149661,
+    "file": "08_expect_duplicate_event_delivery.mp4"
+  },
+  {
+    "number": "09",
+    "title": "Stop failure from amplifying load",
+    "duration": 34.10049886621316,
+    "start": 269.2363718820862,
+    "file": "09_stop_failure_from_amplifying_load.mp4"
+  },
+  {
+    "number": "10",
+    "title": "Run, explain, then extend",
+    "duration": 39.70888888888889,
+    "start": 303.33687074829936,
+    "file": "10_run_explain_then_extend.mp4"
+  }
+]

@@ -1,0 +1,20 @@
+# Generated Java files
+/build/
+*.class
+
+# Local editor and operating-system files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local credentials and settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Distribution archives are generated outside this repository
+*.zip
+*.bundle

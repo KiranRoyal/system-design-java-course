@@ -1,0 +1,835 @@
+# System Design with Java
+A course from fundamentals to advanced distributed systems
+
+This course teaches you to design, explain, build, and operate backend systems using Java. You will move from a single application and database to replicated services, event processing, and regional failure recovery. Each design begins with a user need, states its assumptions, and tests what happens when a component becomes slow, unavailable, or inconsistent.
+
+Use the course for three purposes together. For interviews, practice a clear chain of reasoning and defend tradeoffs. For implementation, run the Java labs and extend the capstone. For work, produce requirements, an architecture decision record, capacity estimates, operational signals, and a recovery plan before approving a design.
+
+The supplied implementations are teaching systems. Ten executable labs and one HTTP capstone run on JDK 21 without third-party Java dependencies. They expose the algorithms clearly. They do not replace PostgreSQL, Redis, Kafka, production authentication, or a real consensus implementation. Advanced infrastructure integrations are specified as exercises, not presented as completed source code.
+
+## How to study
+Plan for 16 weeks at 8 to 10 hours per week. Read a module, draw its request and data flows from memory, run the relevant lab, change an assumption, and explain the result aloud. Spend approximately three hours reading and watching, four hours building, and two hours on review each week. If Java is new to you, add two to four weeks for classes, collections, exceptions, generics, tests, and threads before starting the API capstone.
+
+Do not measure progress by the number of videos watched. You understand a component when you can explain what it stores, who owns that state, which invariant it protects, what it costs, and how the system behaves when it fails. Keep a decision journal containing an assumption, the alternatives considered, a choice, and the evidence that would cause you to change it.
+
+## Sixteen week learning path
+@table
+Week | Modules | Deliverable
+1 | 01 and 02 | Requirements brief and Java concurrency notes
+2 | 03 and 04 | Request path drawing and capacity worksheet
+3 | 05 and 06 | API contract and scaling plan
+4 | 07 and 08 | SQL schema and transaction race analysis
+5 | 09 and 10 | Storage comparison and cache lab
+6 | 11 and 12 | Consistency choice and sharding experiment
+7 | 13 and 14 | Queue experiment and idempotent outbox lab
+8 | 15 and 16 | Order saga and dependency failure policy
+9 | 17 and 18 | SLO document and authorization design
+10 | 19 and 20 | Rollout plan and file processing design
+11 | 21 and 22 | Feed design and consensus failure timeline
+12 | 23 and 24 | Regional recovery plan and mock interview
+13 | Case studies 1 and 2 | URL shortener and rate limiter designs
+14 | Case studies 3 and 4 | Notifications and order workflow designs
+15 | Case studies 5 to 8 | Upload, chat, feed, and analytics reviews
+16 | Final capstone | Working extension, evidence, and design defense
+@endtable
+
+## Start the source code
+Install a JDK that supports Java 21, then verify that java and javac report compatible versions. The project uses records, virtual threads, and the JDK HTTP server. It needs no Maven, Gradle, Docker, or external service for the supplied labs. The commands below are run from the extracted course folder.
+@code
+java -version
+javac -version
+sh scripts/build.sh
+java -cp build/classes course.Labs all
+sh scripts/test.sh
+sh scripts/run.sh 18080
+@endcode
+On Windows, run powershell -ExecutionPolicy Bypass -File scripts/build.ps1, then run the java commands from the project root. If a port is already occupied, choose another port and update the Postman baseUrl variable. Use Ctrl+C to stop the teaching server. A restart discards its links, orders, idempotency history, cache, and events.
+
+The provided core test run passed 30 checks. The local environment used to assemble this package did not permit opening a listening socket, so network integration tests and the Postman collection were not executed here. Run scripts/test.sh on your machine for the full test suite. The source of every HTTP integration test is in SelfTest.java. See evidence for the actual recorded results.
+
+## Using the videos
+The videos folder contains an original narrated sample walkthrough, a transcript, and a topic-to-video guide. External links point to the original publishers; their videos are not copied into this package. The guide separates introductory visual explanations from university lectures. Some university implementations use languages other than Java, while the companion labs here use Java. Publisher pages and links were checked on 6 November 2026; playback availability may depend on your region or account.
+
+# 01 Thinking in systems
+## Start with behavior and invariants
+System design means deciding how components cooperate to deliver observable behavior within constraints. A component might be a Java process, a database, a queue, or an outside provider. Architecture describes their responsibilities and relationships. Detailed design describes the classes, schemas, and algorithms that implement them. A clean class diagram cannot by itself explain how a service survives a database outage.
+
+Begin with functional requirements: who uses the service, what they do, and what output they expect. Then define quality requirements numerically: expected peak traffic, response time, durability, freshness, availability, retention, and operating cost. Mark estimates as assumptions. A design for 100 employees can be excellent with one application and one database; a worldwide service needs different evidence before making the same choice.
+
+An invariant is a rule that must remain true despite concurrency and failure. Examples include no negative inventory, one accepted order per checkout attempt, and no private document returned to an unauthorized reader. Different operations can tolerate different consistency. A stale product description may be acceptable while a stale stock reservation is not. Choose guarantees per workflow, rather than giving an entire company one consistency label.
+
+## Build a first architecture
+For a small order service, start with client, application, and relational database. The application validates the request, checks authorization, reserves inventory, records an order, and returns its identifier. Draw the happy path, then cross out each box in turn. If the application crashes after commit but before replying, the client cannot infer whether the order exists. This is the first motivation for idempotency, which you implement in Module 14.
+
+Scale only after identifying the pressure. More application replicas help CPU-bound request work if shared dependencies can absorb the extra load. They do not fix a missing index, a hot database row, or an external provider's quota. Measure the bottleneck before adding components whose failure modes you must now operate.
+
+@figure baseline
+
+## Practice and review
+Write a one-page specification for a grocery checkout service. Include five user actions, three numeric objectives, three invariants, and three explicit exclusions. Use made-up traffic numbers but label them. Interview prompt: why begin with a modular monolith? A strong answer explains transactional simplicity, team size, deployment ownership, and evidence that would justify extracting a service.
+
+Production review: identify the owner of every durable record and every critical dependency. A design is incomplete if the team cannot say who restores data or handles a stuck workflow. Video: V02. Continue with the case-study template in the appendix.
+
+# 02 Java foundations for system design
+## Concurrency changes correctness
+A Java thread is an execution path inside a process. Multiple threads can observe and change shared state. A race occurs when correctness depends on their timing. For example, checking that a map lacks a checkout key and then inserting an order in two separate operations can create two orders. A thread-safe map makes individual operations safe; it does not automatically make a multi-step business operation atomic.
+
+Use immutable values for requests and results. Records help express small data carriers, although a record that contains a mutable collection is not deeply immutable. Use a monitor, lock, atomic operation, or database transaction for the actual invariant. Keep a critical section short. Holding a lock while making an unbounded network call serializes callers behind a slow dependency.
+
+Java 21 virtual threads make many blocking tasks cheaper to schedule. They do not create CPU cores, database connections, provider quota, or unlimited memory. A service with ten thousand virtual threads can still overwhelm a database pool of fifty connections. Bound concurrency near each scarce resource and put a deadline on waiting. CPU-heavy work needs capacity planning based on cores and workload, regardless of the thread type.
+
+## Understand the lab
+Run course.Labs bulkhead. Twenty tasks share three semaphore permits; no more than three tasks perform the protected work simultaneously. The lab waits for permits to make the concept visible. The HTTP capstone instead uses tryAcquire and returns 503 when its admission limit is reached. In production, use bounded waiting where useful and reject when the remaining request deadline is too small.
+
+Use System.nanoTime for elapsed durations such as TTL and timeout accounting. It is not a timestamp to store in a database or compare across machines. Use an appropriate wall-clock representation for business dates, while recognizing that clocks can disagree. Fake monotonic clocks in the tests make expiry deterministic without sleeping.
+
+## Practice and review
+Read TtlCache.java and OrderStore.java. Identify exactly which fields each synchronized method protects. Exercise: replace the atomic order operation with separate lookup and insert steps in a copy, then write a barrier-based concurrency test that exposes duplicate creation. Do not rely on a race appearing every time by chance.
+
+Interview prompt: does ConcurrentHashMap make a checkout service correct? Answer: only if all required business transitions are protected; multiple maps and an event record still need a common atomic boundary. Production review: check connection pool limits, cancellation, rejected tasks, memory growth, and shutdown behavior. Reading: J1 and J2. Video: V03, lecture 2 on system models, for the broader failure context.
+
+# 03 Networks and the life of a request
+## Trace each hop
+A browser typically resolves a hostname through DNS, establishes a transport connection, negotiates TLS for HTTPS, sends an HTTP request, and waits for the response. Proxies and existing pooled connections can change which steps happen for each request. DNS resolves names to addresses; it does not guarantee that an application at an address is healthy.
+
+TCP provides an ordered byte stream, not application message boundaries or business success. TLS protects data in transit and authenticates endpoints according to the certificate and trust configuration. HTTP gives request methods, headers, bodies, and status semantics. HTTP/2 multiplexes streams over a connection; HTTP/3 uses QUIC. Protocol choices affect connection behavior, but cannot remove slow storage or an overloaded downstream dependency.
+
+REST commonly exposes resources with HTTP semantics. RPC frameworks model method calls and can provide generated clients, streaming, and typed messages. WebSockets support a persistent bidirectional channel. Server-sent events support a server-to-client event stream over HTTP. Polling is simple and can be adequate when updates are infrequent. Pick according to interaction and operational constraints, not a universal ranking.
+
+## Timeouts create uncertainty
+Imagine a client with a 500 ms deadline calling a service that commits at 450 ms. The response is lost and the deadline expires. The client knows only that it did not receive a timely answer. It cannot conclude that the operation was rolled back. This is why transport retries and application idempotency must be designed together.
+
+Give each hop a bounded time budget and propagate the remaining deadline. Include connection establishment and resource acquisition where relevant. Reuse connections when appropriate, but bound pools and watch queueing. A single overall deadline prevents a stack of individually reasonable waits from becoming a multi-second surprise.
+
+## Practice and review
+Run the HTTP capstone and inspect a request with curl -i. Observe Content-Type, Location, Cache-Control, status, and body. A 302 link redirect tells the client where to go; the Java service does not fetch the destination itself. That distinction changes both latency and failure ownership.
+
+Exercise: draw separate timelines for failure before commit and failure after commit before response. Both can look identical to a timed-out caller. Interview prompt: when would you choose WebSockets over polling? Answer with update rate, bidirectionality, connection count, reconnects, proxies, and backpressure. Production review: inspect DNS behavior, TLS termination, proxy timeouts, connection limits, and the ownership of end-to-end deadlines. Videos: V03 lecture 1 and V04.
+
+# 04 Capacity estimation and performance
+## Keep units visible
+Start from demand. If one million daily users make twenty requests each, the average is 20,000,000 / 86,400, or about 231.5 requests per second. An assumed tenfold peak gives about 2,315 requests per second. The peak factor is a hypothesis to validate against real usage, not a property of all services. Separate reads, writes, long connections, and batch traffic because they consume different resources.
+
+For a stable system, Little's Law relates average work in the system, arrival rate, and average time: L = lambda times W. At 2,315 requests per second and a mean residence time of 0.2 seconds, approximately 463 requests are in flight on average. Do not substitute p99 latency into this formula and call the result an exact capacity requirement. Queues, burstiness, and headroom need separate attention.
+
+Ten million records per day at 500 bytes per record produce 5 GB per day in decimal units before indexes, replication, metadata, compression, and backups. Ninety days gives 450 GB raw. Three full replicas would contribute approximately 1.35 TB of raw replicated data before those additional costs. Network rate must use bytes per response and requests per second; convert to bits when comparing link capacity.
+
+## Latency and throughput are different
+Latency is how long one operation takes. Throughput is work completed per unit time. A batch can raise throughput while increasing the waiting time for an individual item. Percentiles expose tails that averages hide. If a request waits for many downstream calls, one slow branch can delay the whole result. Correlated outages make simple independence assumptions unreliable.
+
+A load test should declare workload mix, arrival pattern, payload distribution, concurrency, warmup, duration, error threshold, and latency target. Increase demand until the target is missed; report the last acceptable operating region. A closed-loop client that slows down with the server can hide the true backlog that an independent arrival process would create.
+
+## Practice and review
+Run course.Labs capacity and verify the arithmetic manually. Exercise: calculate storage for 30 days, two replicas, and a 50 percent index overhead applied per replica. Answer: 5 GB/day times 30 times 2 times 1.5 equals 450 GB, excluding backups and logs. State those exclusions.
+
+Interview prompt: how many servers are needed? First ask for measured capacity per instance at the target latency and error rate, then account for redundancy, bursts, growth, and downstream limits. Production review: re-run a representative test after changing indexes, serialization, or concurrency. The supplied lab is an estimate, not a benchmark of a real distributed deployment. Video: V02 for the estimation step.
+
+# 05 API contracts and compatibility
+## Make behavior explicit
+An API contract describes the operations a caller may perform and what the caller can rely on. Specify the method, path, authentication, input types, size limits, response schema, error behavior, pagination, retry policy, and side effects. Document what 202 Accepted means if processing is asynchronous; it should not accidentally promise that a business operation has completed.
+
+Use stable identifiers and distinguish invalid input, missing resources, conflicting state, quota exhaustion, and temporary unavailability. HTTP status codes alone cannot describe every business outcome, so return a stable error structure and a request identifier for support. Avoid exposing stack traces or internal configuration. Compatibility includes semantics: a field can retain its type while changing meaning in a way that breaks clients.
+
+Cursor pagination usually behaves better than deep offsets for large changing datasets. For a descending order feed, a cursor can contain the last created_at and id pair. Query records before that pair using the same stable ordering and a matching composite index. Sign or otherwise validate client-supplied cursors as needed; never treat an opaque encoding as authorization.
+
+## Read the supplied contract
+api/openapi.json is the source of truth for the capstone interface. Requests use text/plain bodies to keep the Java example dependency-free. POST /links accepts an HTTP or HTTPS URL. POST /orders accepts an integer amount in cents and requires Idempotency-Key. It returns 201 for a new order, 200 for a replay of the same key and amount, and 409 when the key is reused with a different amount.
+
+The example stores only a toy order amount, not a real checkout or payment. A production request would include a validated schema, authenticated customer context, a server-calculated price, and a policy for idempotency retention. The idempotency key must be scoped to a caller and operation. A client-supplied amount is not a trusted price.
+
+## Practice and review
+Import api/course.postman_collection.json, start the server, and run the collection. Inspect both the first order response and the replay. Exercise: add a new optional field without changing existing responses, then define how older clients behave. Keep contract, examples, implementation, and tests aligned.
+
+Interview prompt: when does an API version need to change? Discuss consumer compatibility and migration rather than saying every new field needs a new URL. Production review: enumerate callers, validate request sizes, redact sensitive fields, enforce ownership checks, and define deprecation observability. Videos: V04 and V02. Reading: J1 and the bundled OpenAPI file.
+
+# 06 Scaling applications and load balancing
+## Add replicas with clear state ownership
+Vertical scaling gives one machine more resources. Horizontal scaling distributes work among machines. Horizontal scaling helps when work can be divided and shared dependencies retain enough capacity. A stateless application replica can serve any authorized request using state stored in shared systems. Stateless does not mean the product has no state; it means request correctness does not depend on one process's private memory.
+
+A load balancer distributes connections or requests among backends. Layer 4 routing works at the transport level. Layer 7 routing understands application protocol information such as HTTP paths and headers. Round robin is simple; least-connections and latency-aware approaches respond differently to long or uneven work. Keep health detection, draining, and overload behavior explicit.
+
+A health check must answer a useful question. A liveness check asks whether a process needs restarting. Readiness asks whether it should receive traffic. Marking every instance unready whenever a shared database slows can remove the entire service without helping the database. The response may instead require shedding expensive work while retaining useful endpoints.
+
+## Sessions and autoscaling
+Keeping a session only in one Java process makes replica failure log out users or lose work. Sticky routing can hide that limitation during normal operation but does not provide durable state. Prefer an explicit session store or a well-designed token approach, with revocation and security requirements considered separately.
+
+Autoscaling reacts after observing demand and starting capacity. It cannot instantly absorb every spike. Scale on a signal related to the bottleneck, such as CPU for CPU work or backlog age for workers. Set maximum scale to protect downstream dependencies. Distribute instances across failure domains, and reserve enough capacity to survive the loss you claim to tolerate.
+
+## Practice and review
+Draw two replicas of the capstone behind a balancer. Explain why their link maps, token buckets, and idempotency keys disagree. This is an intentional limitation of the teaching implementation. Exercise: specify which state moves to PostgreSQL, which to Redis, and which can remain a local optimization.
+
+Interview prompt: why did doubling application replicas make database latency worse? The extra replicas may have doubled connections and concurrent queries against the same bottleneck. Production review: check draining, long-lived connections, zone loss, maximum connection counts, startup time, and retry amplification. Videos: V05 and V06.
+
+# 07 Relational data and indexes
+## Model from access patterns and constraints
+A relational database stores structured records with keys, relationships, constraints, and transactional operations. Begin with entities and the queries the product needs. For orders, typical access patterns include finding an order by id, listing one customer's recent orders, and finding events waiting for publication. These patterns should influence indexes and retention plans.
+
+A primary key uniquely identifies a row. Foreign keys can enforce valid references. Unique constraints protect invariants such as one idempotency record per customer and operation key. A check constraint can reject impossible values. Application validation improves feedback, while database constraints protect against competing writers and alternate write paths.
+
+A B-tree index helps locate a subset of ordered values without scanning every row. An index on customer_id, created_at, id can support one customer's ordered history when query predicates and sort direction align with the index. Column order matters. An index costs storage and maintenance on writes; indexing every column is not a general optimization.
+
+## Read an execution plan
+Use EXPLAIN to inspect how a query is planned. EXPLAIN ANALYZE executes it and reports actual behavior, so be careful with mutating statements or expensive production queries. Compare estimated rows with actual rows, identify broad scans, repeated loops, large sorts, and unnecessary row fetching. Query selectivity, statistics, data distribution, and buffer state influence performance.
+
+An N plus one query pattern fetches a list and then performs another query for each item. Ten pages of results can turn into hundreds of round trips. Depending on the workload, use a join, batched fetch, or a read model. Denormalization duplicates data to speed access and creates a consistency responsibility; it should have a rebuild or reconciliation story.
+
+## Practice and review
+Study sql/reference.sql. It supplies schema examples and transaction recipes for a PostgreSQL extension; it is not executed by the JDK labs. Exercise: design a query for a customer's next page of orders using the last timestamp and id. Add an index, then explain which columns are filtered and ordered.
+
+Interview prompt: why can an index fail to improve a query? Answers include low selectivity, a mismatched leading key, functions that prevent an ordinary index match, a tiny table, and a plan dominated by fetching many rows. Production review: inspect real plans and distribution, not only a small synthetic dataset. Video: V07, lectures 1, 2, 8, and 9. Reading: D1 and D2.
+
+# 08 Transactions and concurrent updates
+## Protect the business transition
+A transaction groups operations into a unit with defined commit and rollback behavior. Atomicity concerns the unit succeeding or failing together. Consistency in ACID refers to preserving declared application and database rules. Isolation controls what concurrent transactions can observe. Durability concerns committed data surviving failures within the database's configured guarantees. ACID consistency is not the same concept as replica consistency in CAP.
+
+Suppose stock is one. Two requests both read one, both approve a reservation, and both later write zero. The final number appears valid, but two customers were promised the same unit. Protect the decision, not merely the final column type. One approach is an atomic conditional update: decrement stock only where available is at least the requested quantity, then require exactly one affected row.
+
+Optimistic concurrency uses an expected version and retries or reports conflict if the version changed. Pessimistic locking holds an appropriate lock while checking and updating. Both need a policy for contention and deadlocks. A serializable transaction can reject a conflicting execution; the application must safely retry the entire transaction when appropriate.
+
+## Isolation depends on the database
+Read committed generally prevents dirty reads, but separate statements can observe different committed states. Snapshot-style isolation can stabilize a view without preventing every multi-row anomaly. Write skew occurs when two transactions read a shared condition and change different rows in ways that jointly violate an invariant. Exact guarantees vary by database and isolation level; consult the chosen implementation instead of relying on names alone.
+
+Keep transactions short and avoid a remote provider call inside an open database transaction. A slow provider can hold locks and connections while other users queue. Record the local intent and use a workflow to coordinate external effects. Module 15 covers compensating actions when a global atomic commit is unavailable.
+
+## Practice and review
+Exercise: sketch the two-client interleaving for overselling one item. Replace the read-then-write with UPDATE inventory SET available = available - 1 WHERE sku = ? AND available >= 1. Explain why the application must check the affected-row count and commit related order changes in the same transaction.
+
+Interview prompt: does a distributed lock automatically prevent stale writers? No; a paused worker can continue after its lease expires. The protected resource may need a fencing token or version check. Production review: examine isolation settings, lock duration, deadlock retry limits, and uniqueness constraints. Videos: V07 transaction and concurrency lectures, V03 lecture 7. Reading: D1.
+
+# 09 Choosing storage systems
+## Compare required operations
+SQL and NoSQL are broad families, not a speed ranking. A relational database is often a strong default when you need constraints, joins, and transactions over structured business records. A key-value store serves direct lookup by key. A document store groups nested data that is often read together. A wide-column system organizes large partitioned datasets around selected access paths. A graph database specializes in relationships and traversals.
+
+Choose based on query shapes, consistency, transactions, partitioning, data size, operational experience, and recovery needs. A document can simplify a product aggregate but become expensive if many independent writers modify a very large document. A wide-column table can handle predictable access well while requiring another table for a different query. There is no free arbitrary-query capability at unlimited scale.
+
+Object storage holds large immutable or versioned byte sequences economically. Use a database for metadata, ownership, processing state, and lookup. A search engine maintains an index suitable for text relevance and filtering. A warehouse or analytical store favors scans and aggregation over large datasets. Keep the source of truth explicit when copying data into any derived system.
+
+## Storage engines influence costs
+B-tree structures favor ordered lookup and range operations. Log-structured merge designs typically buffer writes and merge sorted data over time. Compaction, write amplification, read amplification, and storage amplification affect real cost. A Bloom filter can reduce unnecessary reads for absent keys, but it cannot prove that a key exists. A cache can help hot reads but does not change the underlying durability requirement.
+
+Moving data between stores introduces delay and failures. If a product update commits but its search event is delayed, search results can be stale. Define a freshness objective, observe the age of unprocessed changes, and make the index rebuildable. Avoid relying on a search index as the only recoverable copy of a business record.
+
+## Practice and review
+Compare storage choices for orders, product images, recent chat history, and sales analytics. Write one required query, one invariant, and one operational risk for each. Exercise: identify the source of truth and rebuild path for a product search index.
+
+Interview prompt: why not store everything in one technology? A good answer first considers whether one store is sufficient; each additional store adds consistency, expertise, and operations costs. Production review: validate backup restore, schema evolution, compaction or vacuum behavior, and maximum partition size. Videos: V07 storage lectures and V03 replication lectures. Reading: D2.
+
+# 10 Caching and invalidation
+## A cache trades freshness and complexity for less work
+A cache keeps reusable results close to consumers. In cache-aside, the application checks the cache, reads the backing store on a miss, then caches the value. In write-through, the write path updates a cache together with its backing behavior according to the chosen implementation. Write-behind acknowledges before durable persistence and therefore needs an explicit loss and recovery policy.
+
+Time to live limits how long an entry can be served without refresh. Eviction removes entries to enforce capacity. These solve different problems: a bounded cache can still hold stale data, and a TTL-only cache can grow too large between expirations. Choose keys that include all inputs that affect the result, including tenant, authorization scope where relevant, and version.
+
+A cache stampede happens when many callers miss the same expensive key together. Coalesce concurrent loads for one key, spread expirations with jitter, or refresh selected hot entries before expiry. Negative caching can reduce repeated expensive misses, but a short-lived absence may hide a newly created record. Decide its TTL from the product's freshness requirement.
+
+## Follow an invalidation race
+A reader misses, reads an old value from the database, and pauses. A writer updates the database and invalidates the cache. The reader resumes and caches the old value. Simple update-then-delete did not prevent a stale fill. Depending on requirements, use versioned values, conditional publication, ordered change events, or accept bounded staleness. Distributed invalidation must also handle delayed or duplicated messages.
+
+The local capstone synchronizes its map and cache operations together so deletion cannot race with a stale fill in that one process. This is easy to reason about but does not solve the same race across multiple replicas. TtlCache implements LRU capacity and monotonic expiry; it does not implement a distributed cache or loader coalescing.
+
+@figure cache
+
+## Practice and review
+Run course.Labs cache. At exactly five seconds, the entry expires. Inspect the test that advances a fake clock rather than sleeping. Exercise: calculate expected average read time for a 90 percent hit ratio, a 2 ms cache check, and a 40 ms extra store read on a miss. Answer: 0.9 times 2 plus 0.1 times 42 equals 6 ms under these simplified assumptions; it says nothing about p99.
+
+Interview prompt: should checkout trust a cached price? Treat cache correctness according to the business rule and validate authoritative pricing in the purchase path. Production review: track hit ratio, misses, eviction, value size, key cardinality, load time, and stale-serving behavior. Video: V08. Reading: C1.
+
+# 11 Replication consistency and CAP
+## Copies introduce a visibility question
+Replication keeps copies of data on multiple nodes. It can improve availability, read capacity, or recovery, depending on how writes are acknowledged and failures are handled. A leader-based design orders writes through one authority and sends changes to followers. With asynchronous replication, the leader can acknowledge before followers have applied the change. A follower read may therefore return an older value.
+
+Linearizability requires each operation to appear to take effect at one point between its invocation and completion, respecting real-time ordering. Eventual consistency promises convergence under its assumptions when updates stop and communication recovers; it does not specify a universal maximum delay. Read-your-writes is a session guarantee that helps a user see their own successful changes. These guarantees answer different questions.
+
+A replica can receive a later update before an earlier one in some systems. Ordering by an authoritative sequence or rejecting older versions prevents the old update from overwriting the new state. Wall-clock timestamps alone may be unsafe when clocks disagree. The supplied ReplicationDemo uses one leader's increasing version to make this distinction visible.
+
+## What CAP actually asks
+During a network partition, nodes cannot communicate normally. For an affected operation, a distributed system cannot guarantee both linearizable behavior and the formal availability property that every request to a non-failing node eventually receives a response. Real designs choose which operations reject or wait and which may proceed with weaker consistency. CAP is not a rule to choose any two letters in all circumstances.
+
+A majority quorum is useful because majorities intersect. With five replicas, a majority is three, and at most two can be unavailable while still forming one. However, simply setting read quorum plus write quorum greater than replica count does not by itself establish linearizability. Protocol details, concurrent writes, membership, version selection, and failures still matter.
+
+@figure replication
+
+## Practice and review
+Run course.Labs replication. Observe a stale follower, a session read that falls back to the leader, and an old version being ignored after a newer delivery. This is an in-memory model with no networking, election, durability, or partitions. Exercise: if the leader is unreachable and the follower is stale, decide what a checkout read should do and separately what a product-description read should do.
+
+Interview prompt: what does availability mean in CAP versus an SLO? CAP uses a formal progress property; an SLO usually measures service outcomes over a period. Production review: define write acknowledgement, replication lag, failover data-loss bounds, and read routing. Video: V03 lectures 5 and 7. Reading: R1 and R2.
+
+# 12 Partitioning sharding and hot keys
+## Partition by the work you need to localize
+Partitioning divides a dataset or workload into pieces. Sharding usually places those pieces on different storage nodes. Replication copies a piece; sharding divides the whole. A system can use both. Select a shard key that distributes volume and load while keeping important operations local enough to remain efficient.
+
+Hash partitioning spreads keys across buckets but generally makes range queries harder. Range partitioning supports ordered scans, yet sequential inserts can concentrate work at one end. Directory-based routing gives flexible placement but introduces metadata that must be available and consistent. Partitioning by customer can localize transactions, while a very large customer may become a hot partition.
+
+A hot key can overwhelm one partition even when average distribution is balanced. Adding ordinary shards does not split a single heavily accessed key. Depending on semantics, use caching, read replication, time buckets, salted write keys, or aggregation. Salting changes the read path because a query may need to merge several subkeys. Explain that cost when proposing it.
+
+## Consistent hashing reduces remapping
+A hash ring assigns positions to nodes and keys. A key belongs to the next node around the ring. Adding a node changes ownership of part of the space instead of changing almost every modulo assignment. Virtual nodes give each physical node many positions to improve distribution. They do not guarantee perfect balance or eliminate skew in request popularity.
+
+Real resharding needs data movement, concurrent-write handling, routing version changes, verification, and rollback. A placement function is only one part. During migration, a write may need forwarding or a controlled ownership handoff so that two nodes do not both act as authoritative owners. Watch temporary storage and network headroom as well as steady-state capacity.
+
+## Practice and review
+Run course.Labs hashing. It assigns ten thousand keys, adds a fourth node, and counts changed owners. The observed fraction is a measurement for this hash function and key sample, not a universal constant. The expected share under an ideal balanced model is roughly one quarter. The source does not migrate or store data.
+
+Exercise: design a shard key for chat history where most queries fetch one conversation's recent messages. Discuss what changes for one enormous public channel. Interview prompt: how do you reshard without losing writes? Describe routing epochs, copy and catch-up, ownership transfer, and verification. Production review: track the largest and hottest partitions, not just averages. Videos: V03 replication material and V09 partition lessons.
+
+# 13 Queues event logs and Kafka
+## Decouple timing with an explicit backlog
+A queue lets producers hand work to consumers that process it later. A log retains ordered records so consumers can track positions and replay. Many products combine aspects of both. Asynchronous processing improves responsiveness when a user can wait for completion, but it adds backlog, delivery uncertainty, duplicate processing, and operational state.
+
+A producer rate of 1,000 items per second and a consumer capacity of 800 grows backlog by 200 items per second. Ten minutes adds 120,000 items. After producers stop, those items take 150 seconds to drain at 800 per second, ignoring overhead. If producers continue at 700, spare capacity is only 100 and draining takes 1,200 seconds. Queue depth alone is less informative than depth together with age and arrival rate.
+
+Kafka partitions provide an ordered record sequence within a partition, not a total order across all partitions. A consumer group distributes partition ownership among its members. A consumer may process several partitions, while each partition normally has one active assigned member in a group at a time. Rebalances and crashes make offset management part of correctness.
+
+## Delivery guarantees need a boundary
+If a consumer performs a database effect and crashes before committing its offset, it may receive the record again. If it commits first and crashes before the effect, the work may be lost. Choose at-least-once delivery with an idempotent effect when that fits the workload. Kafka transactions can provide strong guarantees for supported Kafka processing paths, but they do not automatically make an arbitrary external database write or email exactly once.
+
+Use a stable event identifier, a partition key that matches ordering requirements, a versioned schema, and a retry policy. A dead-letter queue isolates records requiring investigation; it is not a substitute for ownership, alerts, repair, and controlled replay. Poison records must not block all useful work indefinitely.
+
+## Practice and review
+Run course.Labs queue to see a bounded in-memory queue reject a third item. Then run outbox to see duplicate delivery. These are local simulations, not Kafka clients. Exercise: choose the partition key for inventory updates that must stay ordered per SKU and facility. Explain why ordering across independent SKU keys may be unnecessary.
+
+Interview prompt: what happens when there are more consumers than partitions? Extra members can be idle for partition processing; adding workers does not split one partition's order. Production review: verify topic, group, actual partition owner, deployed version, rebalance history, offset timing, lag age, retries, and dead-letter replay. Videos: V09 and V10. Reading: K1.
+
+# 14 Idempotency and the transactional outbox
+## A retry must preserve intent
+An operation is idempotent if repeating it has the same intended effect as performing it once. Creating an order is not naturally idempotent. Give the logical checkout attempt a stable key, scope it to the authenticated caller and operation, and store the result together with a fingerprint of the request. The same key and request returns the stored result; a different request with the same key is a conflict.
+
+Do not generate a new key for each network retry. Do not trust an unbounded global key map. Specify retention, storage limits, in-progress behavior, and how clients reconcile after the retention window. A request timeout after commit must be able to retrieve the committed result. Unique constraints or another atomic operation must prevent concurrent callers from both winning creation.
+
+An outbox handles the database-and-message dual-write problem. In one database transaction, write the business change and an outbox record. A relay publishes the record later and records completion. If the relay publishes and crashes before marking the record sent, the record can be published twice. The outbox closes a loss window but still requires downstream duplicate handling.
+
+## Make effects and deduplication atomic
+A consumer should check an event identifier and apply its database effect within an appropriate atomic boundary. Recording the identifier before the effect can lose work after a crash. Recording it after the effect in a separate transaction can duplicate work. For an external effect such as a payment provider, use that provider's idempotency support where available and add reconciliation for unknown outcomes.
+
+OrderStore.java models a local atomic boundary using synchronized methods. It records the order, idempotency mapping, and event while holding the same monitor. Its Consumer models deduplication and a toy effect in one synchronized method. Neither object survives a process restart. The lab simulates a relay interruption while consumer memory remains alive; it does not prove crash-safe exactly-once effects.
+
+@figure outbox
+
+## Practice and review
+Run course.Labs outbox. Replaying checkout-1 creates one order. Delivering the same event twice produces one toy effect. The tests send one hundred concurrent creations with the same key and verify a single order and event. Exercise: draw each crash window between transaction commit, publication, consumer effect, and acknowledgement.
+
+Interview prompt: does an outbox guarantee exactly once? Explain atomic local commit, at-least-once publication, and idempotent consumption at the defined effect boundary. Production review: verify durable deduplication, unique constraints, key scope, retention, relay ownership, event age, and reconciliation. Video: V10 and the included sample video. Reading: K1 and P1.
+
+# 15 Sagas and business workflows
+## Coordinate steps without pretending they are one transaction
+An order may need inventory reservation, payment authorization, shipment creation, and notification. These operations often belong to separate systems. A local database transaction cannot roll them all back. A saga models a sequence of durable steps and compensating actions, with retry and recovery rules for every transition.
+
+Orchestration uses a coordinator to track state and request actions. Choreography lets services react to events without one central step controller. Orchestration makes workflow state easier to inspect but adds an owner that must be durable and available. Choreography can fit simple flows, yet long chains become difficult to understand and recover. Choose according to the complexity and ownership of the workflow.
+
+A compensation is a business action, not a time machine. Releasing a reservation can undo a hold; refunding a captured payment has different timing and consequences from never charging. Sending an email cannot be unsent. Define which actions are reversible, which are retryable, and which require human review. A timeout produces an unknown outcome until checked or reconciled.
+
+## Work through an order state machine
+Start at CREATED. Reserve inventory and move to RESERVED only after confirmed success. Authorize payment and move to PAYMENT_AUTHORIZED. Confirm the order, then arrange fulfillment. A terminal failure before payment can release inventory. A cancellation after shipment may require a return process rather than a simple state reset.
+
+Persist the workflow state and step identifiers. Reject or ignore stale transitions according to version and current state. Use idempotent commands so a restarted coordinator can retry a step safely. Define timer ownership and lease or fencing behavior when multiple workers compete for a workflow. Periodic reconciliation should find workflows whose age exceeds expectations.
+
+@figure saga
+
+## Practice and review
+Extend the order capstone on paper before coding. Define states, allowed transitions, timeout paths, compensation, and the status visible to the customer. Exercise: payment timed out but later succeeded; inventory reservation expired meanwhile. Explain a reconciliation policy that avoids creating a false confirmation or blindly charging again.
+
+Interview prompt: when would two-phase commit be appropriate instead? Discuss participant support, coordinator recovery, blocking risk, latency, and the business need for atomicity. Do not claim sagas provide full isolation between intermediate steps. Production review: inspect stuck-state age, retry exhaustion, ownership, terminal-state correctness, and audit history. Videos: V10 and V03 lecture 7. Reading: R1.
+
+# 16 Timeouts retries circuit breakers and overload
+## Control amplification
+Every remote call needs a timeout related to an end-to-end deadline. Retry only failures that may succeed later, only when the operation can be repeated safely, and only while budget remains. Exponential backoff spreads attempts over time; jitter prevents many clients from retrying in synchronized waves. A retry budget limits the additional demand failure handling creates.
+
+If three layers each make up to three attempts, one original request can cause as many as twenty-seven calls at the bottom. That can turn a partial outage into overload. Assign retry responsibility deliberately and observe attempts separately from original requests. A client cancellation also needs to stop useful downstream work where possible; otherwise abandoned requests continue consuming capacity.
+
+A circuit breaker stops admitting calls after observed failures and later allows limited probes. It can reduce wasted work while a dependency recovers. It does not prove the dependency is down and does not replace a timeout. A bulkhead limits the resources one dependency or tenant can occupy. Load shedding rejects work that the service cannot handle within its objectives.
+
+## Understand the supplied breaker
+CircuitBreaker.java opens after a configured number of consecutive failures. After a cooldown, one probe is allowed. Concurrent calls remain rejected while that probe is active. A generation number prevents a late success from a call admitted before opening from incorrectly closing a newer breaker state. This is a teaching policy; a production library may use rolling windows and richer failure classification.
+
+Run course.Labs breaker and bulkhead. The breaker demonstration uses a local callable that fails, not an actual external network service. The code intentionally does not impose a deadline on that callable. A hung probe would therefore keep the breaker half open until the action returns; callers need their own bounded operation.
+
+## Practice and review
+Exercise: give a request a 600 ms total deadline with one potential retry. Allocate connection time, useful processing, and backoff without exceeding the deadline, then explain how to skip the retry when the first attempt used too much time. There is no single correct allocation without measured latency and business requirements.
+
+Interview prompt: should every 500 response be retried? Consider idempotency, failure classification, remaining time, overload, and downstream effect uncertainty. Production review: track retry rate, rejected calls, pool waits, queue age, and fallback correctness. A fallback must not silently invent authoritative inventory or payment success. Video: V10 on service coordination. Reading: P1.
+
+# 17 Observability and service objectives
+## Measure user outcomes before machine activity
+A service-level indicator, or SLI, measures an aspect of delivered behavior. A service-level objective, or SLO, sets a target over a defined window. An agreement, or SLA, adds an external commitment and consequences. Keep these distinct. A CPU graph is useful for diagnosis but does not directly tell you whether users completed checkout.
+
+For a request-based SLO of 99.9 percent success over a rolling window containing one million eligible requests, the error budget is one thousand failed requests. Define eligibility and success carefully. Do not silently exclude overload errors just because they make the number worse. A duration-based availability target uses time as its denominator; do not mix that with a request-based budget without an explicit model.
+
+Metrics summarize rates and distributions. Logs provide discrete event detail. Traces connect operations across service boundaries. Carry a trace context and a business correlation identifier where appropriate, but avoid placing personal data or secrets in telemetry. High-cardinality labels such as order_id can make a metrics system expensive and unstable; use logs or traces for per-order investigation.
+
+## Detect and diagnose separately
+Alert on a symptom that needs action, such as rapid consumption of an error budget or an old processing backlog. Use dependency latency, saturation, queue depth, and deployment history to explain it. A burn rate compares the observed error ratio with the allowed ratio; at 1 percent errors against a 0.1 percent allowance, burn is ten times the budget rate.
+
+An incident investigation starts with scope and a timeline: affected users, endpoints, regions, start time, changes, and corroborating signals. Form a hypothesis, predict evidence, query for it, and revise when the evidence disagrees. For asynchronous failures, inspect the actual consumer instance and deployment that owned the partition rather than assuming the producer's service also processed the event.
+
+## Practice and review
+Read /metrics in the capstone and connect cacheHits and cacheMisses to two redirect requests. These counters are local teaching telemetry, not a full production exporter. Exercise: define success, latency, and event-freshness SLIs for notifications. Include a numerator, denominator, time window, target, and alert owner.
+
+Interview prompt: how do you know an asynchronous upload succeeded? The API's acceptance response is insufficient; measure terminal processing outcomes and age from acceptance to completion. Production review: test alerts, dashboards, trace propagation, sensitive-data handling, and runbooks. Videos: V11 and V09 consumer lessons. Reading: O1 and O2.
+
+# 18 Security privacy and multi tenant systems
+## Authorization is part of the data path
+Authentication establishes an identity. Authorization decides what that identity may do to a particular resource. A valid login does not authorize reading every order id. Check tenant and ownership boundaries on every relevant query and operation. A hard-to-guess identifier is useful but is not an access-control rule.
+
+Use established identity protocols and maintained libraries rather than inventing token formats or cryptography. Validate token issuer, audience, signature, expiry, and applicable scopes. Protect credentials with a secret-management process, rotate them, and grant the minimum access required. Encrypt traffic where appropriate and define storage encryption, backup access, and deletion requirements from the data's sensitivity.
+
+Input validation needs limits on size, shape, nesting, and permitted values. Use parameterized SQL. Defend upload paths against arbitrary object keys, path traversal, oversized files, and unsafe parsing. A service that fetches user-provided URLs needs a server-side request forgery defense and egress policy. A redirect-only service has a different threat model, including malicious links and abuse reporting.
+
+## Isolation must survive optimization
+Tenant isolation can use separate databases, schemas, or shared tables with tenant keys and enforced access policies. Each choice has cost and operational implications. Include tenant identity in cache keys and background job context. A correctly authorized database query can still leak information if a global cache returns another tenant's result.
+
+Rate limiting, quotas, and resource isolation protect one customer from another customer's accidental or deliberate overload. Audit sensitive actions with actor, resource, decision, and time while minimizing retained personal information. Set a retention schedule and make deletion propagate to derived indexes, caches, and backup policies as required by the product and applicable obligations.
+
+## Practice and review
+The supplied HTTP server binds to loopback and has no authentication. It is deliberately unsuitable for public deployment. Exercise: add an authenticated principal to the design, then explain how order lookup, idempotency scope, rate limits, and event metadata all change. Keep administrative dispatch inaccessible to ordinary users.
+
+Interview prompt: can a signed token replace database authorization? It may carry trusted claims, but resource ownership, revocation, and changing permissions still need a design. Production review: test cross-tenant requests, expired credentials, unsafe uploads, secrets in logs, and authorization after cache hits. Video: V12. Reading: S1. This module provides engineering principles, not an assessment of a real deployment.
+
+# 19 Deployment schema evolution and recovery
+## Release without requiring all components to change together
+A deployable system needs compatible versions to coexist. A rolling release temporarily runs old and new application instances together. A canary sends a controlled portion of traffic to the new version and compares meaningful outcomes. A blue-green approach maintains two environments and switches routing, which can simplify some rollbacks but still requires compatible data and external effects.
+
+Use expand-and-contract migrations. First add a compatible field or table. Deploy code that can tolerate old and new forms. Backfill data with throttling and resumable progress. Move readers and writers deliberately, verify the result, then remove the obsolete structure after old clients and binaries are gone. Dropping a column in the same step that introduces a new application version can make rollback impossible.
+
+Containers package an application environment; an orchestrator schedules and restarts workloads. Neither automatically makes the application resilient. Define resource requests, limits, health probes, graceful shutdown, readiness, configuration, and secret injection. During shutdown, stop taking new work and finish or relinquish owned work safely within a bounded grace period.
+
+## Backups are only useful if restoration works
+Recovery point objective, or RPO, is the tolerated data loss measured in time or another explicit unit. Recovery time objective, or RTO, is the tolerated time to restore service. A replica is not a backup against an accidental deletion that replicates everywhere. Keep recoverable versions and test restoring data into an isolated environment.
+
+A disaster exercise should include credentials, metadata, configuration, encryption keys, queues, and dependent systems, not only database files. Measure actual restore time and verify business invariants after recovery. A failover procedure that promotes a stale replica needs a policy for acknowledged writes that may be absent and for preventing the old writer from returning as an authority.
+
+## Practice and review
+Exercise: add a currency field to the order model without breaking an older client or making existing amounts ambiguous. Describe schema change, default interpretation, backfill, validation, rollout, and rollback. Do not assume all historical amounts share a currency unless the business establishes that fact.
+
+Interview prompt: what makes a deployment reversible? Discuss database compatibility and external side effects as well as application binaries. Production review: require evidence from a restore drill and a rollback rehearsal, not just a configured backup schedule. Video: V13. Reading: O2 and G1.
+
+# 20 Files uploads search and approximate structures
+## Separate bytes from metadata
+Large files should usually flow to object storage while application services manage authorization, metadata, and processing state. A client can obtain a short-lived upload authorization, transfer bytes, and finalize the upload. Verify object identity, size, checksum, type, and ownership before marking the file ready for processing. A multipart upload needs cleanup for abandoned parts.
+
+An asynchronous processing workflow might move through UPLOADING, UPLOADED, VALIDATING, PROCESSING, COMPLETED, or FAILED. Persist progress so a worker can retry or resume. For a spreadsheet import, stream rows or process bounded chunks rather than loading a very large workbook and every derived object into heap at once. Define row-level errors and whole-file failure conditions separately.
+
+A file event can be delivered twice, and two files can contain overlapping business changes. Deduplicate by stable job or chunk identity and enforce the actual business key in the storage layer. The filename alone is rarely a sufficient identity. Track schema version, uploader, processing version, and the worker that owns the job.
+
+## Search is a derived view
+A search index organizes text and fields for efficient retrieval and ranking. Build it from authoritative records using a controlled event or change-data-capture path. Define the maximum acceptable indexing delay and a rebuild procedure. Updates and deletions need version handling so late events cannot resurrect old content. Authorization filters must remain correct even when the index is stale.
+
+A Bloom filter is a compact probabilistic membership structure. It can say definitely absent or possibly present. False positives are possible; ordinary insert-only Bloom filters do not produce false negatives for inserted items under correct operation. They are useful for avoiding some expensive absent-key reads, not for authorizing users or proving payment uniqueness.
+
+@figure upload
+
+## Practice and review
+Run course.Labs bloom. It inserts one thousand known keys and counts false positives against ten thousand absent keys. Change the bit count and number of hashes and compare the result. Exercise: explain why a positive result still requires an authoritative lookup and why clearing one bit is unsafe as a general deletion operation.
+
+Interview prompt: how would you process a ten-gigabyte upload? Address direct transfer, bounded processing, durable progress, idempotent chunks, validation, and customer-visible status. Production review: inspect memory bounds, backpressure, temporary files, object lifecycle, ownership, and replay. Videos: V07 index and filter lectures, V09 event processing. Reading: D2 and F1.
+
+# 21 Feeds chat and realtime delivery
+## Match distribution to read and write patterns
+A feed can be assembled when read or prepared when written. Fanout on read fetches recent posts from followed accounts and merges them. It saves write work but can make reads expensive. Fanout on write copies post references into follower inboxes, making reads cheap while amplifying writes. A popular account with millions of followers can make one post costly to distribute.
+
+A hybrid system can precompute ordinary accounts and merge posts from very large accounts at read time. Define ordering, pagination, deletion, blocks, privacy changes, and ranking separately. A copied reference is a derived view that must not bypass current authorization. Eventual feed freshness may be acceptable even when privacy enforcement is strict.
+
+Chat adds connection ownership and delivery semantics. A gateway maintains live client connections, while durable message storage and a delivery system handle history and offline users. Presence indicates an approximation of recent connectivity; a disconnected phone may not disappear instantly. A WebSocket acknowledgement is not automatically durable storage or a read receipt.
+
+## Establish the ordering boundary
+Most chat products need order within one conversation, not a global order across all conversations. Use a suitable conversation-specific sequence or another defined ordering mechanism. Client-generated message identifiers help deduplicate resends after reconnecting. Store a reconnect cursor and fetch missed durable messages rather than assuming the live connection saw everything.
+
+Bound per-connection output buffers. A slow client must not force unlimited memory growth in the gateway. Drop disposable presence updates, coalesce state where valid, or disconnect with a recovery path. Retain durable messages in storage so reconnect can resume from a known cursor. These choices should be visible in the protocol.
+
+## Practice and review
+Exercise: draw a message from sender to durable log to connected recipient, then show the same recipient offline. Label when each acknowledgement is sent and what it guarantees. For feeds, calculate write amplification for a post to 500 followers versus five million followers.
+
+Interview prompt: why can an unread counter be wrong after retries? Duplicate increments and out-of-order read markers require an idempotent or sequence-aware model. Production review: monitor connection count, reconnect rate, delivery lag, slow-client buffers, privacy propagation, and hot conversations. Videos: V03 lecture 8 and V14. The source package contains reusable primitives; complete chat and feed applications are design exercises.
+
+# 22 Consensus clocks and coordination
+## Agreement needs a protocol
+Consensus lets participants agree on a value or ordered sequence despite defined failures. A replicated state machine applies the same ordered commands to deterministic state transitions. Raft divides the problem into leader election, log replication, and safety rules. It uses terms and majority agreement; an implementation must also persist required state and handle restart, delayed messages, and membership changes.
+
+In a five-node majority-based group, three votes form a majority. Two disjoint groups cannot both contain three of the same five members, which helps prevent conflicting authorities under the protocol. A two-node group cannot tolerate one unavailable node and still have a majority. More nodes can improve fault tolerance but add coordination and operational costs.
+
+Failure detection is not certainty. A timeout may mean a crash, a pause, a slow network, or overload. Safety means the system never produces an invalid result under its stated assumptions. Liveness means it eventually makes progress when the required conditions hold. A system may preserve safety by stopping writes while it lacks a quorum.
+
+## Time and leases require care
+Physical clocks can move or disagree. Monotonic local clocks measure elapsed time but are not comparable across machines. Lamport clocks preserve a useful ordering implication: if one event causally precedes another, its logical timestamp is smaller. The reverse implication does not hold; a smaller timestamp alone does not prove causality. Vector clocks can capture more causal information at additional metadata cost.
+
+A lease grants temporary ownership. A worker can pause, lose the lease, and resume after another worker takes over. Fencing tokens solve a related stale-writer problem only when the protected resource rejects operations with an older token. Merely checking a lock service before writing is insufficient if the writer pauses between the check and the write.
+
+## Practice and review
+Draw a five-node cluster divided into groups of three and two. Explain which side may make progress under a majority protocol and what must happen when the network heals. Exercise: make a timeline where an expired worker writes after a replacement worker, then show the resource rejecting the lower fencing token.
+
+Interview prompt: can the supplied HashRing elect a leader? No. Placement, membership, failure detection, and consensus are distinct problems. Production review: use a maintained coordination system rather than turning the course model into a homegrown database. Videos: V03 lectures 3 to 6 and V15. Reading: R1 and R2.
+
+# 23 Regions cost and disaster strategy
+## Choose what regional redundancy must accomplish
+Multiple availability zones can protect against some local failures. Multiple regions address a broader failure and latency problem, but create longer communication paths, replication delay, routing complexity, and cost. Start with the required failure scenario, RPO, RTO, data residency, and user distribution. A second region is not useful if all credentials or control-plane dependencies remain unavailable during the same incident.
+
+Active-passive designs direct normal writes to one region and prepare another for failover. Active-active can allow multiple regions to serve traffic, but write ownership and conflict handling must be explicit. Routing all requests globally does not mean all data can safely be written everywhere. A common compromise assigns each entity a home region and routes authoritative writes there.
+
+Cross-region synchronous coordination can strengthen an acknowledgement guarantee while adding network latency and reducing progress when a required region is unavailable. Asynchronous replication reduces coupling but creates a possible loss window during promotion. Do not promise both zero data loss and uninterrupted writes through every partition without explaining the protocol and assumptions.
+
+## Account for the whole cost
+Estimate compute, storage, replicas, indexes, network egress, inter-region transfer, observability, backups, and operational effort. A tiny reduction in database load may not justify another stateful service that the team cannot operate. Track cost per useful business unit, such as per thousand notifications delivered, rather than only the total bill.
+
+Capacity needed for failover is often larger than normal spare capacity. If two regions each run near their maximum, one cannot automatically absorb the other. Test the actual degraded mode, including caches that are cold and rate limits shared with external providers. Define what functionality can be reduced while preserving core business behavior.
+
+## Practice and review
+Exercise: design an order service with a stated RPO of five minutes and RTO of thirty minutes. Explain replication, restore or promotion, fencing the old writer, traffic switching, and reconciliation. Then change the requirement to no loss of acknowledged orders and explain the additional coordination or recovery mechanism needed.
+
+Interview prompt: why can multi-region make availability worse? More dependencies, configuration complexity, correlated deployments, and untested failover can outweigh redundancy. Production review: perform a controlled regional-loss exercise and record measured recovery, data validation, and unresolved gaps. Videos: V03 lecture 8 and V11. Reading: O2.
+
+# 24 Interview reasoning and architecture review
+## Use a repeatable sequence
+For a forty-five-minute interview, an adaptable allocation is five minutes on requirements, five on scale and data, ten on a baseline architecture, fifteen on the most important bottlenecks and failure cases, and ten on tradeoffs, operations, and questions. Adjust to the interviewer rather than following the clock mechanically. Explain assumptions before calculating from them.
+
+Start with the simplest design that satisfies the stated use case. Trace one write and one read completely. Name the durable source of truth and the atomic boundary. Add replication, caching, queues, or partitioning only when a requirement or measured constraint justifies them. When asked to scale, identify which component saturates first and what evidence would confirm the guess.
+
+Say what a guarantee covers. Instead of claiming exactly once, say that a unique database key prevents duplicate order creation within a durable retention window, while events may be delivered more than once. Instead of claiming high availability, identify the failure domain tolerated and the expected user behavior during recovery.
+
+## Review a production design with evidence
+A work design needs more than a convincing whiteboard. Include caller inventory, data classification, capacity measurements, schema migration, observability, ownership, rollout, rollback, restore evidence, and cost. Record alternatives and why they were rejected under current assumptions. State the signals that would cause the design to be revisited.
+
+Use a scorecard with six areas: requirements, data correctness, scale, failure handling, operations, and communication. Score each from zero to four. Zero means missing; one means named; two means explained; three means quantified with a plausible mechanism; four means supported by implementation or test evidence. A large number of named technologies does not earn a high score.
+
+## Practice and review
+Choose one case study and explain it in ten minutes without notes. Then answer these changes: traffic increases tenfold, the database becomes slow, an event is duplicated, one region is unavailable, and a customer asks for data deletion. Record where the design stops meeting its objectives.
+
+Exercise: review the supplied capstone as if asked to launch it publicly. Identify missing durable storage, identity, authorization, TLS termination, distributed quotas, real telemetry, and operational recovery. Propose a staged implementation and evidence plan. The correct result is an honest gap analysis, not approval because the happy path runs.
+
+Video: V02. Complete the capstone assessment at the end of this guide before calling the course finished.
+
+# Case study 1 URL shortening
+## Requirements and baseline
+Design a service that accepts a long HTTP or HTTPS URL and returns a short identifier. Users follow the identifier to reach the original destination. Assume ten million new links per day, a hundred reads per write, ninety days of active retention, and a target redirect p99 below 100 ms within the serving region. These are exercise assumptions, not claims about an existing product.
+
+The write path validates input, generates a candidate identifier, and inserts the mapping under a unique constraint. A collision causes another attempt. Random identifiers avoid one central sequence but need enough entropy and abuse controls; sequential identifiers are compact but reveal enumeration and may need allocation coordination. Base62 is an encoding, not a security boundary or collision-resolution algorithm.
+
+The read path reaches a regional application, checks a cache, reads the mapping store on a miss, and returns a redirect. A 302 can fit a service whose destination might change; permanent redirects can be cached by clients and intermediaries, which complicates later edits or takedowns. Record analytics asynchronously so tracking does not dominate redirect latency.
+
+## Scale and failure analysis
+At one billion reads per day, average read load is about 11,574 requests per second before peak adjustment. Cache popular mappings and protect the backing store during cold-cache events. Partition by the short identifier if one store no longer meets capacity. Track expiry and deletion consistently across cache and storage. A CDN may help cache public redirects when its behavior matches the product's freshness and abuse policy.
+
+A store outage creates a product decision: serve known cached destinations for a bounded period or fail according to the required freshness policy. Do not serve a removed malicious destination indefinitely because it happens to be cached. A write acknowledged before durable storage can create a short URL that disappears after restart.
+
+## Implement and extend
+CourseServer implements POST /links, GET /r/{id}, and DELETE /links/{id} with a bounded local map and cache. It uses twelve hexadecimal characters from a random UUID and checks collisions in the local map. This is a teaching choice, not the final capacity or privacy design for the assumed traffic.
+
+Exercise: replace the map with durable storage, add ownership and expiry, and define safe deletion propagation. Acceptance evidence should include concurrent creation, collision handling, cache miss behavior, deletion after a cache hit, and restart persistence. Interview follow-up: a celebrity posts one link and traffic becomes highly skewed; explain which layer absorbs the hot key. Videos: V05, V08, and the sample walkthrough.
+
+# Case study 2 Distributed rate limiting
+## Choose the quota semantics
+Design a limit of one hundred requests per minute per authenticated customer, with a short burst allowance. Clarify whether the limit is approximate or strict across all regions, what counts as a request, and whether different operations have different cost. A costly export should not necessarily consume the same budget as a cheap lookup.
+
+A fixed window is simple but can allow a large burst around a boundary. A sliding log tracks precise timestamps at a memory cost. A sliding counter approximates a moving window with less state. A token bucket replenishes credit at a fixed rate up to a maximum, allowing controlled bursts. A leaky-bucket-style queue can smooth output but introduces waiting and needs a bounded capacity.
+
+## Place and coordinate the state
+The local TokenBucket synchronizes refill and consumption using a monotonic clock. With four independent replicas, four buckets can collectively admit roughly four times a supposed global allowance. A shared atomic store operation can coordinate a regional limit. Shard quota keys carefully and enforce expiration so inactive customers do not create unbounded state.
+
+A strict global quota requires coordination or a carefully allocated quota scheme. One option leases chunks of a global budget to regions; it reduces per-request coordination but needs rules for stranded quota and possible overshoot during failures. Define fail-open or fail-closed behavior separately for ordinary traffic, costly operations, and abuse protection.
+
+## Implement and extend
+Run course.Labs limiter. Three initial requests succeed, the fourth fails, and half a second at two tokens per second restores one token. GET /limited in the capstone uses one process-wide bucket with capacity five and refill one per second. A rejection returns 429 and Retry-After of one second. It is not a per-user or distributed implementation.
+
+Exercise: design tenant-scoped keys and an atomic Redis implementation, then describe which clock computes refill and what a region outage does. Acceptance evidence should include concurrent callers, exact refill boundaries, burst limits, idle-key cleanup, and the documented behavior when the quota store fails. Interview follow-up: explain how a large tenant can avoid monopolizing shared resources even while staying within its own quota. Videos: V04 and the included sample video rate limiting chapter.
+
+# Case study 3 Notification delivery
+## Separate acceptance from delivery
+Design email, SMS, and push notifications triggered by business events. Requirements include templates, user preferences, provider limits, retries, deduplication, and a delivery history. A response saying the request was accepted must not imply that the recipient's device displayed the message. Define statuses such as ACCEPTED, QUEUED, SENT_TO_PROVIDER, DELIVERED, and FAILED according to actual provider evidence.
+
+An ingress service validates the request and writes durable intent. Channel-specific workers consume jobs, enforce provider quotas, render versioned templates, and call the provider with an idempotency key if supported. Persist attempts and normalized outcomes. Preferences should be evaluated at the correct business moment; a late retry must not ignore a later opt-out when policy requires respecting it.
+
+## Plan for unknown outcomes
+The provider can accept a request while the caller times out. A blind retry may send the notification twice. Reuse provider-supported idempotency and query status where available. Otherwise document the duplicate risk and reconcile through receipts or a business policy. A provider outage should build a bounded, observable backlog without exhausting application threads.
+
+Different notifications have different urgency. A login code needs a short expiry and should not arrive hours later after a queue drains. A monthly statement can tolerate delay. Use priorities carefully so a large low-priority batch cannot starve time-sensitive work, and so low-priority work still eventually progresses.
+
+## Implement and extend
+Use the outbox and bounded-queue labs as building blocks. The included Consumer only increments a toy counter; it sends no email, SMS, or push message. For an extension, start with a local fake provider that returns scripted success, timeout, and quota responses before using any real provider.
+
+Exercise: define a retry schedule with expiry, maximum attempts, and dead-letter ownership for a password-reset message. Acceptance evidence should demonstrate duplicate event handling, an ambiguous provider timeout, template compatibility, opt-out enforcement, and backlog recovery. Interview follow-up: how would you guarantee exactly one delivered email? Explain the boundary you control and why recipient delivery generally cannot be guaranteed solely by your queue. Videos: V09 and V10.
+
+# Case study 4 Orders inventory and payment coordination
+## Define the invariant before the service map
+Design checkout for a product with scarce inventory. Requirements include one order per logical checkout, no overselling under the chosen inventory model, an accurate customer-visible state, and recovery from provider timeouts. Treat prices and eligibility as authoritative server-side decisions. Keep real payment data and provider integrations outside the course implementation.
+
+A possible design reserves stock with an atomic conditional update, records an order and outbox event in the same database transaction, and advances a durable workflow. The payment step uses a stable provider idempotency key. On success the workflow confirms the order; on a terminal failure it releases the reservation according to policy. Reservation expiry needs coordination with a payment result that arrives late.
+
+## Walk the hard path
+The payment request times out. The workflow must mark an unknown or pending result, not automatically treat it as a definitive decline. A reconciliation worker queries provider state or consumes a trustworthy callback. If the reservation expired while the payment succeeded, the business must choose a valid resolution, such as attempting a new reservation or refunding. Record the decision for support.
+
+A database transaction protects local inventory and order writes, but it does not roll back an external provider. A saga makes those steps and compensations explicit. Partitioning inventory by facility and SKU can localize contention. A very popular item still needs a hot-key strategy, admission control, or a deliberate sales allocation mechanism.
+
+## Implement and extend
+The capstone demonstrates only an accepted toy order with an amount, idempotency, and an outbox. It does not implement inventory, payments, or the full saga. Extend it in stages: durable order storage, inventory reservation, durable event publication, then a simulated payment adapter with failure scenarios.
+
+Exercise: write a state-transition table for reservation success, payment success, payment timeout, cancellation, and late provider success. Acceptance evidence should include one hundred duplicate checkout attempts, a conflicting payload with the same key, a relay interruption after publish, and recovery of an old pending workflow. Interview follow-up: explain why a distributed lock alone is weaker than a storage-enforced invariant. Videos: V10, V03 lecture 7, and the sample walkthrough.
+
+# Case study 5 Large file ingestion
+## Make progress durable and bounded
+Design a service that imports large product catalogs. Users need upload progress, validation feedback, processing status, and a downloadable error report. An API process should not keep a multi-gigabyte workbook in memory while waiting for all rows to commit. Upload the bytes to object storage and store a durable job record separately.
+
+Finalize the object with an expected size and checksum, then create processing work through an atomic intent mechanism. Stream or split the file into bounded chunks. Define a stable chunk identity and an idempotent row operation based on the correct business key and version. Keep rejected rows with an explanation that does not leak other tenants' data.
+
+## Recovery and ownership
+A worker can fail after committing some rows but before updating its progress marker. Replaying the chunk must not repeat an unsafe effect. Store progress and row effects under a suitable atomic boundary, or use idempotent business updates that tolerate replay. Distinguish a file-wide schema error from an individual invalid row and define whether partial success is allowed.
+
+When a Kafka-triggered job is not reflected in the database, inspect the topic, group, partition, assigned consumer instance, deployed code version, and offset timing. A log from the producer or a different consumer is not proof of which code handled the event. Correlate job id, chunk id, event id, trace context, and database outcome.
+
+## Exercise and evidence
+Create a design for a ten-gigabyte file with a maximum worker memory budget of 512 MB. Choose chunk size using measured parser overhead and row expansion, not file bytes alone. Define pause, retry, cancellation, cleanup, and error-report retention. Specify how schema versions are detected before processing begins.
+
+Acceptance evidence should include bounded heap under a large file, duplicate chunk delivery, cancellation during processing, parser failure halfway through a chunk, and a worker restart. The package supplies queue, outbox, and deduplication primitives; a full spreadsheet parser is an extension. Videos: V09 and V07 storage lessons. Reading: F1.
+
+# Case study 6 Realtime chat
+## Separate connection state from message history
+Design one-to-one and group chat with durable history and offline delivery. Assume order is required within a conversation, delivery may be retried, and read receipts are a separate feature. Gateways manage active WebSocket connections and route incoming messages to an authenticated message service.
+
+Assign a stable client message id before the first send. Persist the message with a uniqueness rule scoped to sender and conversation. Assign the authoritative conversation ordering value using a suitable owner or partition. Only acknowledge the durability guarantee after the required persistence succeeds. Fan out live notifications to connected members and let offline members fetch history later.
+
+## Reconnect and backpressure
+A phone can lose connectivity after the server commits but before the acknowledgement arrives. On reconnect, it resends the same message id and receives the stored result. It supplies its last observed sequence or cursor to fetch missed messages. Gaps and out-of-order live delivery should trigger retrieval from durable history rather than silent loss.
+
+A gateway must bound each connection's pending output. Slow clients can be disconnected and recover through history. Presence can expire using heartbeat timestamps and should be presented as approximate. Group membership and block rules must be checked on send and on retrieval; storing an old copy of membership in a cache must not create a lasting privacy leak.
+
+## Exercise and evidence
+Draw a failure timeline for a gateway restart while both participants are connected. Identify the state that is lost, the state that survives, and how each client resumes. Explain what happens if a group's membership changes while delivery is queued.
+
+Acceptance evidence should include duplicate sends, missing acknowledgements, reconnect cursors, unauthorized conversation access, slow recipients, and a hot group. Do not promise global message order when the product only needs per-conversation order. Source mapping: use OrderStore's idempotency pattern, queue bounds, and ReplicationDemo's version reasoning as learning references. Videos: V03 lecture 8 and V14.
+
+# Case study 7 Social feed and search
+## Build a derived read model
+Design a feed of posts from followed accounts and a search view over public posts. Store authoritative posts and access policy in a durable system. Publish changes to feed and indexing workers. Use fanout on write for ordinary accounts if reads dominate, then merge high-fanout accounts on read when their write amplification would be excessive.
+
+A feed entry can store a post id and ordering metadata rather than copying the full post. The read path retrieves current content and verifies visibility. Cursor pagination needs a stable tie-breaker; a ranking model can complicate pagination because scores change. State whether the feed is chronological, ranked within a snapshot, or allowed to shift between pages.
+
+## Deletion and freshness
+Deletion is an event that must reach feed caches and search indexes. Late update events must not resurrect a deleted post; use versions or tombstones with a retention plan. A privacy change may require synchronous filtering at read time even when background cleanup is asynchronous. Derived views should be rebuildable from authoritative data and event history or snapshots.
+
+Search introduces tokenization, relevance, language, filtering, and index refresh behavior. An index can return a stale candidate, so enforce authorization at a trustworthy point. Track freshness by the age of the oldest unindexed change and by sampling end-to-end visibility, not just the worker process's CPU.
+
+## Exercise and evidence
+Calculate the cost of pushing one post to five million follower inboxes versus merging it at read time. Include the read frequency and storage cost before choosing a strategy. Describe a hybrid threshold based on measured work rather than a magical follower count.
+
+Acceptance evidence should include a popular author, deletion with delayed events, a private-to-public and public-to-private transition, index rebuild, duplicate events, and cursor behavior during new posts. Source mapping: caching, hashing, BloomFilter, and version handling are supplied primitives; the complete feed is a design project. Videos: V07 index lectures, V14, and V09.
+
+# Case study 8 Event analytics and audit history
+## Preserve the meaning of an event
+Design a pipeline that reports orders per minute and daily sales. Define event time, processing time, deduplication identity, currency, cancellation semantics, and the source of truth. A counter of accepted messages is not necessarily a count of completed orders. Business corrections and late events can change previous aggregates.
+
+An event pipeline can append durable events, validate schemas, partition by a relevant key, and compute time-window aggregates. A watermark or lateness policy describes how long the system waits for late records and what happens afterward. Retain enough raw data or authoritative history to recompute results when logic changes.
+
+## Correctness before dashboards
+Duplicate delivery can inflate totals. Deduplicate at the appropriate event identity or compute from a state transition that can be applied once. A cancellation may require a compensating event rather than deleting the historical fact that the order was placed. Keep immutable audit intent separate from mutable reporting views.
+
+A streaming view can provide fast preliminary numbers, while a batch reconciliation produces a more complete result. Label freshness and completeness in the user experience. Distinguish a business timestamp from the arrival time at the broker. A backfill must not accidentally look like a sudden burst of new business activity.
+
+## Exercise and evidence
+Given one order event, a duplicate, a cancellation, and a late event from the previous day, calculate both accepted-message count and net completed-order count. Explain why they differ. Define the policy for changing a report that users have already downloaded.
+
+Acceptance evidence should include replay, schema evolution, late events, corrections, consumer restart, and a comparison against authoritative daily totals. Source mapping: use the outbox and deduplicating consumer lab to understand event identity, then extend to a real log and analytical store. Videos: V09, V10, and V14. Reading: K1.
+
+# Final capstone and assessment
+## Build in stages
+Use the supplied HTTP server as a transparent starting point. The final project is a durable order acceptance service with a recoverable event pipeline. Implement it in Java using your chosen maintained framework or the existing JDK server. The staged requirements below are assignments; only the in-memory foundation is included as completed code.
+
+Stage 1 adds PostgreSQL for orders, idempotency, inventory, and outbox records. Make the database the authority for uniqueness and stock. Demonstrate that restarting the application preserves accepted work. Add connection and query timeouts. Keep all SQL parameterized.
+
+Stage 2 adds a relay and a real broker. Decide how multiple relays claim work, recover after a lease expires, and prevent stale acknowledgements. Accept that a publication can repeat. Put consumer deduplication and its local database effect in one transaction. Prove recovery after interruption at each boundary.
+
+Stage 3 adds authentication, tenant-scoped authorization, rate limiting, and a bounded cache where it improves a measured path. Test cross-tenant access and invalidation. Stage 4 adds traces, metrics, structured logs, health behavior, graceful shutdown, and a migration procedure. Stage 5 measures load and performs a restore drill before making any production-readiness claim.
+
+## Required artifacts
+Submit a requirements brief, capacity worksheet, API contract, data model, two request-flow diagrams, decision records, failure matrix, test evidence, SLO definition, rollout plan, rollback plan, and recovery runbook. Record unresolved questions instead of making unsupported guarantees. Include exact commands and versions so another engineer can reproduce the result.
+
+## Acceptance rubric
+@table
+Area | Passing evidence
+Correctness | Concurrent duplicate requests produce one durable order and one logical event
+Inventory | Competing reservations cannot reduce available stock below zero
+Recovery | Restart and replay retain accepted work and avoid duplicate database effects
+Failures | Timeouts and unknown provider outcomes remain distinguishable from rejection
+Security | Every resource operation enforces tenant and ownership boundaries
+Performance | A declared workload meets a declared latency and error target with headroom
+Operations | Useful telemetry, tested alerts, rollback, and a measured restore drill
+Communication | Alternatives and limitations are explained using concrete assumptions
+@endtable
+
+A passing result requires evidence in every row, not merely a working happy path. A completed local lab is a learning milestone. Production readiness depends on the deployment context, workload, failure model, and operational ownership.
+
+# Reference worksheets and answer key
+## Design worksheet
+For each system, write the following in order: user actions; explicit exclusions; traffic and data assumptions; correctness invariants; API behavior; entities and access paths; baseline architecture; one complete write flow; one complete read flow; first bottleneck; failure behavior; observability; security boundaries; deployment and recovery; alternatives and cost. Finish with the three assumptions most likely to change.
+
+## Failure matrix
+@table
+Failure | Question to answer | Typical mechanism to evaluate
+Client retries after timeout | Could the first attempt have committed | Durable idempotency and result lookup
+Database becomes slow | Where does waiting accumulate | Deadlines and bounded admission
+Cache disappears | Can storage survive the miss rate | Warmup coalescing and shedding
+Event arrives twice | Is the business effect repeated | Durable deduplication with atomic effect
+Consumer stops mid job | What has committed already | Checkpoints and replay-safe chunks
+Leader is isolated | Who is authorized to write | Quorum and fencing
+Region fails | What data and capacity remain | Tested failover with declared RPO and RTO
+Schema changes | Can old and new versions coexist | Expand and contract migration
+@endtable
+
+## Quantitative practice with solutions
+Problem 1. Two million daily users each make fifteen requests. Assume an eightfold peak. Average load is 30,000,000 / 86,400 = 347.2 requests per second; peak estimate is 2,777.8 requests per second. These are demand estimates, not a server count.
+
+Problem 2. At 1,200 requests per second and a mean total time of 250 ms, Little's Law gives 300 requests in flight on average for a stable system. It does not establish the p99 queue length or the safe connection-pool size.
+
+Problem 3. A queue receives 900 jobs per second and completes 700 for five minutes. Backlog grows by 60,000 jobs. If arrival then falls to 400 while service remains 700, it takes 200 seconds to drain at a net 300 jobs per second, assuming stable rates.
+
+Problem 4. Ten million eligible requests with a 99.95 percent success SLO permit 5,000 failed requests in the same window. At a 0.5 percent error ratio, budget is being consumed at ten times the allowed ratio. A time-based budget would require a different denominator.
+
+Problem 5. A replicated record uses 2 KB, one million records are added daily, retention is thirty days, and there are three full copies. Raw storage is 180 GB using decimal units. Add separate estimates for indexes, transaction logs, snapshots, backups, and temporary operations.
+
+Problem 6. A five-node majority group needs three participants and can continue forming a majority with two unavailable. It cannot safely make progress on both sides of a three-two network split under the same membership. Actual protocol safety still depends on correct implementation.
+
+## Concept checks with model answers
+Why is a timeout ambiguous? The operation may have failed before commit, committed without a delivered reply, or still be in progress. A client needs idempotency or reconciliation, not an assumption that timeout means rollback.
+
+Why is a replica not a complete backup? Accidental deletes and corrupted application writes may propagate to replicas. Recovery needs appropriately retained copies or logs and tested restoration.
+
+Why can a cache produce a privacy bug? A key may omit tenant or authorization context, or a stale value may bypass a changed access decision. Current authorization must remain enforced.
+
+Why is a dead-letter queue insufficient by itself? It only moves unresolved work. Someone must detect it, diagnose the reason, repair data or code, and replay under a controlled policy.
+
+Why does an outbox still allow duplicates? A relay can publish successfully and stop before recording completion. Repeating the publication preserves delivery but requires an idempotent effect downstream.
+
+Why does consistent hashing not solve a hot key? One key still maps to one owner under ordinary placement. Splitting or replicating its work requires an additional policy compatible with its semantics.
+
+Why can a saga expose intermediate state? Its steps commit independently. A compensation changes later business state but does not erase all observations or effects of the earlier steps.
+
+Why do virtual threads not remove connection limits? They reduce the cost of waiting execution contexts. Database connections, CPU time, memory, and provider quota remain finite resources.
+
+## Common mistakes to correct
+Do not equate a thread-safe collection with an atomic business workflow. Do not claim CAP is a permanent two-of-three product label. Do not claim a quorum formula proves linearizability without a protocol. Do not describe Kafka's supported transactional guarantees as exactly-once effects in every external system. Do not claim a 200 response proves a background job completed. Do not claim encryption replaces authorization. Do not report a toy simulation as evidence of behavior during a real network partition.
+
+# Glossary
+Availability means successful service under a specified definition and measurement window; CAP uses a distinct formal definition. Backpressure means controlling upstream production or admission when downstream work cannot keep up. A bulkhead limits the resources one workload can occupy. A circuit breaker temporarily limits calls after observed failures.
+
+A cache is a reusable copy with an explicit freshness policy. A cache stampede is many simultaneous expensive loads for the same missing data. A CDN distributes cacheable content near clients. Consistent hashing is a placement technique that reduces remapping when membership changes.
+
+A partition is a subset of data or, in networking, a loss of communication between groups; context matters. A shard is a data partition placed separately. Replication maintains copies. A quorum is a required set of participants whose intersection properties support a protocol.
+
+Linearizability is single-operation behavior consistent with real-time ordering. Serializability is transaction behavior equivalent to some serial order. Eventual consistency is convergence under stated assumptions after updates stop and communication recovers. Read-your-writes is a session visibility guarantee.
+
+Idempotency prevents repeated logical work from repeating its intended effect. An outbox stores publication intent with a local business commit. A saga coordinates independently committed steps and compensations. Reconciliation compares uncertain or divergent states and repairs them under a policy.
+
+A deadline is the latest acceptable completion time. A timeout bounds a particular wait. Jitter randomizes timing to avoid synchronized retries. A retry budget limits extra load from repeat attempts. Load shedding rejects work to protect useful service.
+
+An SLI measures service behavior. An SLO sets a target for that behavior. An error budget is the allowed amount of failure under the SLO. RPO defines tolerated data loss; RTO defines tolerated recovery time. A fencing token lets a resource reject operations from an obsolete owner.
+
+Event time is when the represented event occurred. Processing time is when a processor handles it. A watermark supports a defined policy for event-time progress and lateness. A tombstone records deletion so old data does not silently reappear during replay or replication.
+
+A source of truth is the authoritative record for a defined fact. A materialized view is a derived representation prepared for reads. A Bloom filter is an approximate membership structure with possible false positives. An invariant is a condition the system must preserve through allowed operations and failures.
+
+
+# Video lessons and further reading
+
+The following resources extend the original explanations and exercises in this course. Use the module references to select a lesson, then complete its watch task. External videos remain hosted by their publishers. Link discovery and publisher pages were checked on 6 November 2026; playback was not tested end to end.
+
+## V01 Original narrated Java sample
+This course. Ten short chapters introduce requirements, capacity, cache, limits, placement, replication, outbox, resilience, and the capstone. Pause and run the named labs.
+@link Original narrated Java sample|videos/System_Design_Java_Sample.mp4
+
+## V02 System Design Interview A Step By Step Guide
+ByteByteGo. Modules 01, 04, 05, 24. Watch for the reasoning sequence; then solve a different design without copying a diagram.
+@link System Design Interview A Step By Step Guide|https://www.youtube.com/watch?v=i7twT3x5yv8
+
+## V03 Distributed Systems lecture series
+Martin Kleppmann. Modules 02, 03, 11, 12, 15, 21, 22, 23. Lectures 1 networking and RPC; 2 system models; 3 and 4 clocks; 5 replication; 6 consensus; 7 consistency and transactions; 8 case studies. This is a deeper university course.
+@link Distributed Systems lecture series|https://www.youtube.com/playlist?list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB
+
+## V04 What is API Gateway
+ByteByteGo. Modules 03, 05, 06 and rate limiting case study. Explain which responsibilities belong at the edge and which remain in a service.
+@link What is API Gateway|https://www.youtube.com/watch?v=6ULyxuHKxg8
+
+## V05 What is a LOAD BALANCER really about
+ByteByteGo. Module 06 and URL shortener. Draw the routing and health-check path.
+@link What is a LOAD BALANCER really about|https://www.youtube.com/watch?v=LQuuoHTyYz8
+
+## V06 Top 6 Load Balancing Algorithms Every Developer Should Know
+ByteByteGo. Module 06. Compare behavior with slow or long-lived requests.
+@link Top 6 Load Balancing Algorithms Every Developer Should Know|https://www.youtube.com/watch?v=dBmxNsS3BGE
+
+## V07 Introduction to Database Systems Fall 2025 lecture videos
+Carnegie Mellon University. Modules 07, 08, 09, 20. Use Watch beside relational model, SQL, storage, indexes and filters, transactions, concurrency, and recovery. The course projects use C++; the concepts apply to the Java exercises.
+@link Introduction to Database Systems Fall 2025 lecture videos|https://15445.courses.cs.cmu.edu/fall2025/schedule.html
+
+## V08 Caching Pitfalls Every Developer Should Know
+ByteByteGo. Module 10. Draw a stampede and the stale-fill race. Companion overview: https://www.youtube.com/watch?v=dGAgxozNWFE
+@link Caching Pitfalls Every Developer Should Know|https://www.youtube.com/watch?v=wh98s0XhMmQ
+
+## V09 Apache Kafka 101
+Confluent Developer. Modules 12, 13, 17, 20 and pipeline case studies. Follow lessons on events, topics, partitions, producers, and consumers. Optional cloud exercises may require an account; watching the course does not require using a paid service.
+@link Apache Kafka 101|https://developer.confluent.io/courses/apache-kafka/events/
+
+## V10 Designing Event Driven Microservices
+Confluent Developer. Modules 13 to 16 and notification, order, analytics cases. Focus on event ownership, service boundaries, and coordination; use the Java labs to examine duplicate effects.
+@link Designing Event Driven Microservices|https://developer.confluent.io/courses/microservices/overview/
+
+## V11 SLIs SLOs SLAs oh my
+Google Cloud. Modules 17 and 23. Define one user-facing SLI and calculate its error budget.
+@link SLIs SLOs SLAs oh my|https://www.youtube.com/watch?v=tEylFyxbDLE
+
+## V12 OWASP API Security Top 10 Course
+APIsec University and Corey Ball via freeCodeCamp. Module 18. Published for the 2023 edition. Start with object-level authorization at 19:38 and resource consumption at 39:08; map them to the capstone.
+@link OWASP API Security Top 10 Course|https://www.youtube.com/watch?v=YYe0FdfdgDU
+
+## V13 What is Kubernetes
+Google Cloud Tech. Module 19. Introductory orientation only; follow the deployment reading for rollout details.
+@link What is Kubernetes|https://www.youtube.com/watch?v=cC46cg5FFAM
+
+## V14 Thinking in Events From Databases to Distributed Collaboration Software
+Martin Kleppmann. Module 21 and feed, chat, analytics cases. Use the embedded video to connect event processing and collaborative state; this is conceptual material, not a complete chat implementation.
+@link Thinking in Events From Databases to Distributed Collaboration Software|https://martin.kleppmann.com/2021/07/02/debs-keynote-thinking-in-events.html
+
+## V15 In Search of an Understandable Consensus Algorithm
+Diego Ongaro at USENIX ATC 2014. Module 22. Author presentation on Raft; draw election and replication timelines after watching.
+@link In Search of an Understandable Consensus Algorithm|https://www.usenix.org/conference/atc14/technical-sessions/presentation/ongaro
+
+# Primary technical references
+
+Use version-specific documentation when implementing a production extension. These references support further study; the Java labs remain pinned to the Java 21 language target.
+
+J1. Oracle Java 21 HttpServer API.
+@link Oracle Java 21 HttpServer API|https://docs.oracle.com/en/java/javase/21/docs/api/jdk.httpserver/com/sun/net/httpserver/HttpServer.html
+
+J2. Oracle Java 21 Executors API.
+@link Oracle Java 21 Executors API|https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Executors.html
+
+D1. PostgreSQL transaction isolation.
+@link PostgreSQL transaction isolation|https://www.postgresql.org/docs/current/transaction-iso.html
+
+D2. PostgreSQL indexes.
+@link PostgreSQL indexes|https://www.postgresql.org/docs/current/indexes.html
+
+C1. Redis key eviction.
+@link Redis key eviction|https://redis.io/docs/latest/develop/reference/eviction/
+
+K1. Apache Kafka 4 point 1 design and delivery semantics.
+@link Apache Kafka 4 point 1 design and delivery semantics|https://kafka.apache.org/41/design/design/
+
+R1. MIT distributed systems schedule and original papers.
+@link MIT distributed systems schedule and original papers|https://pdos.csail.mit.edu/6.824/schedule.html
+
+R2. Raft paper by Diego Ongaro and John Ousterhout.
+@link Raft paper by Diego Ongaro and John Ousterhout|https://raft.github.io/raft.pdf
+
+P1. AWS Builders Library timeouts retries and backoff with jitter.
+@link AWS Builders Library timeouts retries and backoff with jitter|https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
+
+O1. OpenTelemetry signals.
+@link OpenTelemetry signals|https://opentelemetry.io/docs/concepts/signals/
+
+O2. Google SRE Workbook implementing SLOs and related chapters.
+@link Google SRE Workbook implementing SLOs and related chapters|https://sre.google/workbook/implementing-slos/
+
+S1. OWASP API Security Top 10 2023 edition.
+@link OWASP API Security Top 10 2023 edition|https://api-security.owasp.org/editions/2023/en/0x11-t10/
+
+G1. Kubernetes deployments.
+@link Kubernetes deployments|https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+
+F1. Amazon S3 multipart upload overview.
+@link Amazon S3 multipart upload overview|https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html

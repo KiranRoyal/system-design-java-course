@@ -1,0 +1,124 @@
+VIDEO GUIDE
+Checked 6 November 2026
+
+The included MP4 is an original narrated slide walkthrough with Java snippets and lab observations. It is not a recording of a live distributed deployment. External videos are linked to their publishers; playback was not verified end to end. Availability can change.
+
+V01  Original narrated Java sample
+Creator: This course
+videos/System_Design_Java_Sample.mp4
+Watch task: Ten short chapters introduce requirements, capacity, cache, limits, placement, replication, outbox, resilience, and the capstone. Pause and run the named labs.
+
+V02  System Design Interview A Step By Step Guide
+Creator: ByteByteGo
+https://www.youtube.com/watch?v=i7twT3x5yv8
+Watch task: Modules 01, 04, 05, 24. Watch for the reasoning sequence; then solve a different design without copying a diagram.
+
+V03  Distributed Systems lecture series
+Creator: Martin Kleppmann
+https://www.youtube.com/playlist?list=PLeKd45zvjcDFUEv_ohr_HdUFe97RItdiB
+Watch task: Modules 02, 03, 11, 12, 15, 21, 22, 23. Lectures 1 networking and RPC; 2 system models; 3 and 4 clocks; 5 replication; 6 consensus; 7 consistency and transactions; 8 case studies. This is a deeper university course.
+
+V04  What is API Gateway
+Creator: ByteByteGo
+https://www.youtube.com/watch?v=6ULyxuHKxg8
+Watch task: Modules 03, 05, 06 and rate limiting case study. Explain which responsibilities belong at the edge and which remain in a service.
+
+V05  What is a LOAD BALANCER really about
+Creator: ByteByteGo
+https://www.youtube.com/watch?v=LQuuoHTyYz8
+Watch task: Module 06 and URL shortener. Draw the routing and health-check path.
+
+V06  Top 6 Load Balancing Algorithms Every Developer Should Know
+Creator: ByteByteGo
+https://www.youtube.com/watch?v=dBmxNsS3BGE
+Watch task: Module 06. Compare behavior with slow or long-lived requests.
+
+V07  Introduction to Database Systems Fall 2025 lecture videos
+Creator: Carnegie Mellon University
+https://15445.courses.cs.cmu.edu/fall2025/schedule.html
+Watch task: Modules 07, 08, 09, 20. Use Watch beside relational model, SQL, storage, indexes and filters, transactions, concurrency, and recovery. The course projects use C++; the concepts apply to the Java exercises.
+
+V08  Caching Pitfalls Every Developer Should Know
+Creator: ByteByteGo
+https://www.youtube.com/watch?v=wh98s0XhMmQ
+Watch task: Module 10. Draw a stampede and the stale-fill race. Companion overview: https://www.youtube.com/watch?v=dGAgxozNWFE
+
+V09  Apache Kafka 101
+Creator: Confluent Developer
+https://developer.confluent.io/courses/apache-kafka/events/
+Watch task: Modules 12, 13, 17, 20 and pipeline case studies. Follow lessons on events, topics, partitions, producers, and consumers. Optional cloud exercises may require an account; watching the course does not require using a paid service.
+
+V10  Designing Event Driven Microservices
+Creator: Confluent Developer
+https://developer.confluent.io/courses/microservices/overview/
+Watch task: Modules 13 to 16 and notification, order, analytics cases. Focus on event ownership, service boundaries, and coordination; use the Java labs to examine duplicate effects.
+
+V11  SLIs SLOs SLAs oh my
+Creator: Google Cloud
+https://www.youtube.com/watch?v=tEylFyxbDLE
+Watch task: Modules 17 and 23. Define one user-facing SLI and calculate its error budget.
+
+V12  OWASP API Security Top 10 Course
+Creator: APIsec University and Corey Ball via freeCodeCamp
+https://www.youtube.com/watch?v=YYe0FdfdgDU
+Watch task: Module 18. Published for the 2023 edition. Start with object-level authorization at 19:38 and resource consumption at 39:08; map them to the capstone.
+
+V13  What is Kubernetes
+Creator: Google Cloud Tech
+https://www.youtube.com/watch?v=cC46cg5FFAM
+Watch task: Module 19. Introductory orientation only; follow the deployment reading for rollout details.
+
+V14  Thinking in Events From Databases to Distributed Collaboration Software
+Creator: Martin Kleppmann
+https://martin.kleppmann.com/2021/07/02/debs-keynote-thinking-in-events.html
+Watch task: Module 21 and feed, chat, analytics cases. Use the embedded video to connect event processing and collaborative state; this is conceptual material, not a complete chat implementation.
+
+V15  In Search of an Understandable Consensus Algorithm
+Creator: Diego Ongaro at USENIX ATC 2014
+https://www.usenix.org/conference/atc14/technical-sessions/presentation/ongaro
+Watch task: Module 22. Author presentation on Raft; draw election and replication timelines after watching.
+
+READING AND ORIGINAL SOURCES
+
+J1  Oracle Java 21 HttpServer API
+https://docs.oracle.com/en/java/javase/21/docs/api/jdk.httpserver/com/sun/net/httpserver/HttpServer.html
+
+J2  Oracle Java 21 Executors API
+https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Executors.html
+
+D1  PostgreSQL transaction isolation
+https://www.postgresql.org/docs/current/transaction-iso.html
+
+D2  PostgreSQL indexes
+https://www.postgresql.org/docs/current/indexes.html
+
+C1  Redis key eviction
+https://redis.io/docs/latest/develop/reference/eviction/
+
+K1  Apache Kafka 4 point 1 design and delivery semantics
+https://kafka.apache.org/41/design/design/
+
+R1  MIT distributed systems schedule and original papers
+https://pdos.csail.mit.edu/6.824/schedule.html
+
+R2  Raft paper by Diego Ongaro and John Ousterhout
+https://raft.github.io/raft.pdf
+
+P1  AWS Builders Library timeouts retries and backoff with jitter
+https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
+
+O1  OpenTelemetry signals
+https://opentelemetry.io/docs/concepts/signals/
+
+O2  Google SRE Workbook implementing SLOs and related chapters
+https://sre.google/workbook/implementing-slos/
+
+S1  OWASP API Security Top 10 2023 edition
+https://api-security.owasp.org/editions/2023/en/0x11-t10/
+
+G1  Kubernetes deployments
+https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+
+F1  Amazon S3 multipart upload overview
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
+

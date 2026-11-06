@@ -1,0 +1,251 @@
+1
+00:00:00,000 --> 00:00:05,898
+Welcome to System Design with Java. This sample walks through the learning package using
+
+2
+00:00:05,898 --> 00:00:11,796
+small, inspectable examples. Begin with requirements, not a list of technologies. For checkout, ask
+
+3
+00:00:11,796 --> 00:00:17,695
+what a customer can do, how much traffic to expect, and which rules must
+
+4
+00:00:17,695 --> 00:00:23,593
+always remain true. One logical checkout should create one order. A timeout should not
+
+5
+00:00:23,593 --> 00:00:29,491
+cause a second charge. The course develops these ideas from a single process to
+
+6
+00:00:29,491 --> 00:00:35,389
+distributed workflows. The supplied code is for learning, and advanced production integrations are exercises.
+
+7
+00:00:36,589 --> 00:00:41,218
+Run the capacity lab. One million daily users making twenty requests each produce about
+
+8
+00:00:41,218 --> 00:00:45,847
+two hundred thirty one requests per second on average. Assuming a tenfold peak gives
+
+9
+00:00:45,847 --> 00:00:50,475
+about two thousand three hundred fifteen. With a mean total response time of two
+
+10
+00:00:50,475 --> 00:00:55,104
+hundred milliseconds, Little’s Law gives about four hundred sixty three requests in flight in
+
+11
+00:00:55,104 --> 00:00:59,733
+a stable system. These are estimates under stated assumptions. They do not tell you
+
+12
+00:00:59,733 --> 00:01:04,362
+how many servers you need until you measure what each server and its dependencies
+
+13
+00:01:04,362 --> 00:01:08,990
+can handle.
+
+14
+00:01:10,190 --> 00:01:15,499
+Run the cache lab. The first read returns a stored price. At the five
+
+15
+00:01:15,499 --> 00:01:20,807
+second expiry boundary, the same lookup returns null. The test advances a fake monotonic
+
+16
+00:01:20,807 --> 00:01:26,116
+clock, so it does not need to sleep. Read TtlCache dot java to see
+
+17
+00:01:26,116 --> 00:01:31,424
+a bounded, synchronized least recently used cache. A production cache also needs a plan
+
+18
+00:01:31,424 --> 00:01:36,733
+for concurrent misses, stale data, and invalidation across replicas. Never assume that a fast
+
+19
+00:01:36,733 --> 00:01:42,041
+cached value is authoritative enough for every business decision.
+
+20
+00:01:43,241 --> 00:01:48,629
+The token bucket starts with three tokens and refills at two per second. Three
+
+21
+00:01:48,629 --> 00:01:54,018
+immediate requests succeed, and the fourth is rejected. After half a second, one token
+
+22
+00:01:54,018 --> 00:01:59,406
+is available again. The synchronized method makes refill and consumption atomic inside one Java
+
+23
+00:01:59,406 --> 00:02:04,794
+process. Four replicas with independent buckets do not enforce one shared customer quota. To
+
+24
+00:02:04,794 --> 00:02:10,182
+extend the example, define tenant-scoped keys, an atomic shared operation, and the behavior when
+
+25
+00:02:10,182 --> 00:02:15,570
+the quota store is unavailable.
+
+26
+00:02:16,770 --> 00:02:21,929
+Run the hashing lab. It assigns ten thousand keys to three nodes, adds a
+
+27
+00:02:21,929 --> 00:02:27,087
+fourth node, and counts changed owners. Virtual nodes help spread placement, but the result
+
+28
+00:02:27,087 --> 00:02:32,246
+is not perfectly balanced and a popular key can still be hot. The test
+
+29
+00:02:32,246 --> 00:02:37,404
+verifies that keys moved by adding D now belong to D. This code is
+
+30
+00:02:37,404 --> 00:02:42,563
+only a routing model. A real resharding operation must also copy data, handle writes
+
+31
+00:02:42,563 --> 00:02:47,721
+during movement, transfer ownership safely, and verify that nothing was lost.
+
+32
+00:02:48,921 --> 00:02:53,763
+The replication lab writes one item, copies it to a follower, and then updates
+
+33
+00:02:53,763 --> 00:02:58,604
+the leader to two items. A follower read is stale. A read-your-writes helper requires
+
+34
+00:02:58,604 --> 00:03:03,445
+a minimum version and falls back to the leader. Later, an old delivery is
+
+35
+00:03:03,445 --> 00:03:08,286
+ignored rather than overwriting a newer value. This is a deterministic in-memory model, not
+
+36
+00:03:08,286 --> 00:03:13,128
+a consensus implementation. In a real system, you must also decide what to do
+
+37
+00:03:13,128 --> 00:03:17,969
+when the leader cannot be reached and the follower is behind.
+
+38
+00:03:19,169 --> 00:03:23,811
+A client can time out after the server commits an order but before receiving
+
+39
+00:03:23,811 --> 00:03:28,453
+the reply. The next attempt must reuse the same logical checkout key. OrderStore records
+
+40
+00:03:28,453 --> 00:03:33,095
+the order, the key, and an outbox event inside one synchronized operation. A matching
+
+41
+00:03:33,095 --> 00:03:37,738
+retry returns the same order. A different amount with that key is rejected. The
+
+42
+00:03:37,738 --> 00:03:42,380
+core tests run one hundred concurrent attempts and verify one order and one event.
+
+43
+00:03:42,380 --> 00:03:47,022
+All of this state is in memory, so a durable database is the next
+
+44
+00:03:47,022 --> 00:03:51,664
+extension.
+
+45
+00:03:52,864 --> 00:03:58,726
+Run the outbox lab. The consumer applies an event, but the relay is treated
+
+46
+00:03:58,726 --> 00:04:04,588
+as interrupted before acknowledgement. The same event is delivered again, and the toy effect
+
+47
+00:04:04,588 --> 00:04:10,450
+count remains one. Notice the boundary: consumer memory stays alive. This does not prove
+
+48
+00:04:10,450 --> 00:04:16,312
+crash-safe exactly-once behavior. A durable consumer needs its event identifier and database effect in
+
+49
+00:04:16,312 --> 00:04:22,174
+the same transaction. External providers need their own idempotency and reconciliation design. Always say
+
+50
+00:04:22,174 --> 00:04:28,036
+exactly which effect and failure model a guarantee covers.
+
+51
+00:04:29,236 --> 00:04:34,720
+The circuit breaker opens after two failures and rejects the next call. After cooldown,
+
+52
+00:04:34,720 --> 00:04:40,203
+one successful probe closes it. A generation number prevents a late result from an
+
+53
+00:04:40,203 --> 00:04:45,687
+older call from closing a newer open state. The tests also check that only
+
+54
+00:04:45,687 --> 00:04:51,170
+one recovery probe runs. A breaker does not impose a timeout by itself. Combine
+
+55
+00:04:51,170 --> 00:04:56,653
+bounded calls with retry budgets, jitter, and admission control. Virtual threads make waiting cheaper,
+
+56
+00:04:56,653 --> 00:05:02,137
+but they do not create database connections or provider capacity.
+
+57
+00:05:03,337 --> 00:05:08,838
+Start with the build script, run all ten labs, and inspect the source beside
+
+58
+00:05:08,838 --> 00:05:14,339
+the guide. The full test script also checks the HTTP capstone on your machine.
+
+59
+00:05:14,339 --> 00:05:19,841
+During package creation, thirty core checks passed, while the environment blocked listening sockets, so
+
+60
+00:05:19,841 --> 00:05:25,342
+network integration was not run. The guide contains twenty four modules and eight design
+
+61
+00:05:25,342 --> 00:05:30,843
+cases, plus video links for deeper study. Your final project adds durable storage, a
+
+62
+00:05:30,843 --> 00:05:36,344
+real event pipeline, authorization, observability, and measured recovery. Explain what each test proves and
+
+63
+00:05:36,344 --> 00:05:41,846
+what remains an assumption.
