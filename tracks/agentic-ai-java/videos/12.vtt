@@ -1,0 +1,109 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.119
+Retrieval augmented generation supplies selected external evidence to a model before it
+
+00:00:05.119 --> 00:00:05.546
+answers.
+
+00:00:05.696 --> 00:00:12.951
+The pipeline is query preparation, authorized retrieval, optional reranking, context assembly, generation,
+
+00:00:12.951 --> 00:00:14.160
+and verification.
+
+00:00:14.310 --> 00:00:18.414
+Retrieval quality and answer quality are separate: the right document may be
+
+00:00:18.414 --> 00:00:20.808
+retrieved while the model still misstates it.
+
+00:00:20.958 --> 00:00:25.824
+Require source identifiers that correspond to supplied evidence and make uncertainty explicit
+
+00:00:25.824 --> 00:00:28.663
+when the evidence is missing or contradictory.
+
+00:00:28.813 --> 00:00:32.432
+A citation is useful only if it supports the adjacent claim.
+
+00:00:32.582 --> 00:00:35.570
+Do not treat a plausible-looking source label as proof.
+
+00:00:35.720 --> 00:00:41.606
+Test questions that are answerable, unanswerable, outdated, ambiguous, and adversarial.
+
+00:00:41.756 --> 00:00:46.996
+For A100, the order record supports delayed status and policy v1 supports
+
+00:00:46.996 --> 00:00:48.306
+manual support review.
+
+00:00:48.456 --> 00:00:51.946
+Neither supports an exact delivery date or an approved refund.
+
+00:00:52.096 --> 00:00:55.890
+A grounded answer states the supported facts and stops at that boundary.
+
+00:00:56.040 --> 00:00:59.789
+An answer that adds delivery tomorrow fails even if it cites the
+
+00:00:59.789 --> 00:01:00.414
+order record.
+
+00:01:00.564 --> 00:01:05.566
+Create a 20-question evaluation set with five deliberately unanswerable questions.
+
+00:01:05.716 --> 00:01:10.503
+Grade source correctness, claim support, and appropriate abstention separately.
+
+00:01:10.653 --> 00:01:13.831
+Include one document containing malicious instructions.
+
+00:01:13.981 --> 00:01:17.016
+Use a human-reviewed answer key for important facts.
+
+00:01:17.166 --> 00:01:21.197
+Automated model graders can assist but need calibration against that key.
+
+00:01:21.347 --> 00:01:24.912
+Count unsupported claims even when the answer is otherwise useful.
+
+00:01:25.062 --> 00:01:29.249
+Preserve the adversarial document as data and verify that it does not
+
+00:01:29.249 --> 00:01:30.296
+change tool permissions.
+
+00:01:30.446 --> 00:01:31.117
+Question.
+
+00:01:31.267 --> 00:01:33.398
+Does RAG eliminate hallucinations?
+
+00:01:33.548 --> 00:01:34.125
+Answer.
+
+00:01:34.275 --> 00:01:34.758
+No.
+
+00:01:34.908 --> 00:01:40.121
+It improves access to relevant evidence but retrieval, interpretation, and generation can
+
+00:01:40.121 --> 00:01:40.989
+still fail.
+
+00:01:41.139 --> 00:01:41.811
+Question.
+
+00:01:41.961 --> 00:01:43.716
+When should the assistant abstain?
+
+00:01:43.866 --> 00:01:44.442
+Answer.
+
+00:01:44.592 --> 00:01:49.052
+When authorized evidence cannot support the requested claim or the available sources
+
+00:01:49.052 --> 00:01:50.911
+conflict without a resolvable rule.

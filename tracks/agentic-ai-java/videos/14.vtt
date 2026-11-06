@@ -1,0 +1,109 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.293
+Prompt injection occurs when untrusted content attempts to redirect an application’s behavior.
+
+00:00:05.443 --> 00:00:09.759
+It may arrive in a user message, a retrieved page, a tool
+
+00:00:09.759 --> 00:00:11.558
+response, or another agent’s output.
+
+00:00:11.708 --> 00:00:15.467
+A model that reads instructions and data in the same context can
+
+00:00:15.467 --> 00:00:16.407
+confuse their authority.
+
+00:00:16.557 --> 00:00:20.174
+Delimiters and warning prompts help but are not sufficient controls.
+
+00:00:20.324 --> 00:00:26.478
+Limit tool authority, validate arguments, enforce account access in services, restrict network
+
+00:00:26.478 --> 00:00:30.580
+destinations, and require explicit approval for sensitive effects.
+
+00:00:30.730 --> 00:00:33.687
+Redact secrets before they enter model context.
+
+00:00:33.837 --> 00:00:38.319
+An output filter alone cannot undo an unauthorized database read or external
+
+00:00:38.319 --> 00:00:39.813
+transmission that already happened.
+
+00:00:39.963 --> 00:00:43.805
+The lab has no arbitrary URL tool, no shell tool, and no
+
+00:00:43.805 --> 00:00:44.445
+write tool.
+
+00:00:44.595 --> 00:00:48.189
+OllamaModel accepts only local HTTP endpoints.
+
+00:00:48.339 --> 00:00:52.469
+A model request for another customer’s order receives no private facts.
+
+00:00:52.619 --> 00:00:56.817
+These controls reduce the damage a bad decision can cause, although they
+
+00:00:56.817 --> 00:01:00.315
+do not guarantee that generated prose is truthful or appropriate.
+
+00:01:00.465 --> 00:01:04.310
+Threat-model a document assistant with file upload and URL fetching.
+
+00:01:04.460 --> 00:01:09.678
+List assets, untrusted inputs, possible tool effects, and an abuse test for
+
+00:01:09.678 --> 00:01:10.548
+each boundary.
+
+00:01:10.698 --> 00:01:14.990
+Explain how redirects and internal IP addresses affect a URL allowlist.
+
+00:01:15.140 --> 00:01:20.338
+A safe fetcher validates resolved destinations and every redirect, blocks prohibited networks,
+
+00:01:20.338 --> 00:01:24.669
+caps response size and time, and uses narrow egress rules.
+
+00:01:24.819 --> 00:01:28.077
+Uploaded content is parsed in an isolated pipeline.
+
+00:01:28.227 --> 00:01:32.403
+A malicious document never gains tool permissions simply by being retrieved.
+
+00:01:32.553 --> 00:01:33.225
+Question.
+
+00:01:33.375 --> 00:01:36.219
+Can another agent’s output be trusted automatically?
+
+00:01:36.369 --> 00:01:36.946
+Answer.
+
+00:01:37.096 --> 00:01:37.579
+No.
+
+00:01:37.729 --> 00:01:42.484
+It is another untrusted input unless verified through an explicit contract and
+
+00:01:42.484 --> 00:01:43.276
+authorization boundary.
+
+00:01:43.426 --> 00:01:44.097
+Question.
+
+00:01:44.247 --> 00:01:46.073
+What is least privilege for tools?
+
+00:01:46.223 --> 00:01:46.799
+Answer.
+
+00:01:46.949 --> 00:01:51.823
+Expose only the smallest capabilities and data scope required by the current
+
+00:01:51.823 --> 00:01:52.635
+authenticated task.

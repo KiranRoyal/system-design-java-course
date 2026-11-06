@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+02 Objects interfaces records and exceptions
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+A class combines state and behavior. Encapsulation protects rules by limiting how state can change. An interface describes a capability, allowing implementations to vary without changing callers. Prefer composition when one object uses another capability; inheritance is useful only when the subtype genuinely satisfies the parent contract.
+
+How to reason about it
+Records provide concise data carriers and generated equality, accessors, and string representation. They are useful for request and response DTOs, but JPA entities have different lifecycle and proxy requirements. Exceptions should represent meaningful failure categories. Catch an exception only where you can recover, translate it into a useful boundary contract, or add context without losing the cause.
+
+Worked example
+JavaBasics.Discount is an interface whose implementation can calculate a discount without knowing about Spring. InventoryService has domain-specific Missing and Conflict failures. The HTTP layer translates these into 404 and 409, preserving the distinction between an absent product and insufficient stock.
+
+Practice and model answer
+Implement fixed and percentage discount strategies. Add a maximum discount rule and tests that a discount cannot make the total negative. Explain why a request DTO should not be the same object as a persistence entity. Inject the selected strategy into a calculation service. DTOs expose only the intended public contract; entities represent database state and may include internal fields, relationships, and mutable lifecycle. Keeping them separate prevents accidental API changes when mappings change.
+
+Interview check
+Question. What is dependency inversion? Answer. High-level policy depends on an abstraction rather than a concrete infrastructure detail. Question. When should you use a record? Answer. For a value-like data carrier whose shallow immutability and generated equality fit the intended semantics.

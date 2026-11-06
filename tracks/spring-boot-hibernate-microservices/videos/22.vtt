@@ -1,0 +1,106 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.780
+Authentication establishes identity; authorization decides whether that identity may perform an operation
+
+00:00:05.780 --> 00:00:07.225
+on a resource.
+
+00:00:07.375 --> 00:00:13.881
+Validate token signatures, issuer, audience, and expiry using maintained security libraries.
+
+00:00:14.031 --> 00:00:17.518
+Do not merely decode a JWT and trust its claims.
+
+00:00:17.668 --> 00:00:21.867
+Role checks alone may be insufficient when ownership or tenant boundaries matter.
+
+00:00:22.017 --> 00:00:26.047
+Enforce authorization in the service that owns the data, even when a
+
+00:00:26.047 --> 00:00:27.726
+gateway already checked the request.
+
+00:00:27.876 --> 00:00:33.835
+Protect secrets, restrict CORS deliberately, validate input, and use TLS outside a
+
+00:00:33.835 --> 00:00:34.829
+local environment.
+
+00:00:34.979 --> 00:00:40.297
+CSRF concerns depend on how credentials are attached by browsers; disabling it
+
+00:00:40.297 --> 00:00:43.399
+without understanding the authentication model is unsafe.
+
+00:00:43.549 --> 00:00:48.480
+The supplied commerce services are explicitly local learning apps, bound to loopback,
+
+00:00:48.480 --> 00:00:50.945
+with synthetic data and no authentication.
+
+00:00:51.095 --> 00:00:57.192
+Before exposing them, add an OAuth2 resource-server configuration, account ownership, tenant-scoped idempotency,
+
+00:00:57.192 --> 00:01:00.748
+and tests for cross-account reads and writes.
+
+00:01:00.898 --> 00:01:05.274
+The AI track separately demonstrates trusted tenant checks in its tool boundary.
+
+00:01:05.424 --> 00:01:10.351
+Add a secured profile using a local identity provider or test JWT
+
+00:01:10.351 --> 00:01:10.761
+decoder.
+
+00:01:10.911 --> 00:01:16.670
+Test missing token, wrong issuer, wrong audience, expired token, insufficient role, and
+
+00:01:16.670 --> 00:01:18.110
+another user’s order.
+
+00:01:18.260 --> 00:01:21.509
+Keep the default local demo limitations documented.
+
+00:01:21.659 --> 00:01:26.215
+Use Spring Security’s resource-server support and explicit authorization rules.
+
+00:01:26.365 --> 00:01:30.935
+Derive tenant identity from validated claims mapped by trusted configuration.
+
+00:01:31.085 --> 00:01:34.232
+Test resource ownership independently of role membership.
+
+00:01:34.382 --> 00:01:38.089
+Do not commit credentials or signing keys to the course repository.
+
+00:01:38.239 --> 00:01:38.910
+Question.
+
+00:01:39.060 --> 00:01:42.511
+What is the difference between 401 and 403?
+
+00:01:42.661 --> 00:01:43.238
+Answer.
+
+00:01:43.388 --> 00:01:50.316
+401 indicates missing or invalid authentication; 403 indicates the authenticated caller lacks
+
+00:01:50.316 --> 00:01:53.780
+permission, subject to deliberate resource-hiding policies.
+
+00:01:53.930 --> 00:01:54.602
+Question.
+
+00:01:54.752 --> 00:01:57.459
+Why is gateway-only authorization insufficient?
+
+00:01:57.609 --> 00:01:58.186
+Answer.
+
+00:01:58.336 --> 00:02:03.806
+Internal calls, misconfiguration, or alternate routes can bypass the gateway; the data-owning
+
+00:02:03.806 --> 00:02:06.541
+service must enforce its own policy.

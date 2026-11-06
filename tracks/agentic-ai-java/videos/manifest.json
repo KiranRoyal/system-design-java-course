@@ -1,0 +1,162 @@
+[
+  {
+    "number": 1,
+    "title": "What makes an application agentic",
+    "file": "01.mp4",
+    "seconds": 121.06,
+    "bytes": 1727788,
+    "slides": 5
+  },
+  {
+    "number": 2,
+    "title": "Java foundations for AI applications",
+    "file": "02.mp4",
+    "seconds": 117.02,
+    "bytes": 1727234,
+    "slides": 5
+  },
+  {
+    "number": 3,
+    "title": "Language models tokens and context",
+    "file": "03.mp4",
+    "seconds": 118.92,
+    "bytes": 1718983,
+    "slides": 5
+  },
+  {
+    "number": 4,
+    "title": "Prompts with evidence and clear boundaries",
+    "file": "04.mp4",
+    "seconds": 117.66,
+    "bytes": 1716350,
+    "slides": 5
+  },
+  {
+    "number": 5,
+    "title": "Structured output and validation",
+    "file": "05.mp4",
+    "seconds": 109.9,
+    "bytes": 1601157,
+    "slides": 5
+  },
+  {
+    "number": 6,
+    "title": "Tool design and authorization",
+    "file": "06.mp4",
+    "seconds": 113.54,
+    "bytes": 1634429,
+    "slides": 5
+  },
+  {
+    "number": 7,
+    "title": "Bounded agent loops and stopping conditions",
+    "file": "07.mp4",
+    "seconds": 109.48,
+    "bytes": 1595050,
+    "slides": 5
+  },
+  {
+    "number": 8,
+    "title": "Spring AI integration in Java",
+    "file": "08.mp4",
+    "seconds": 124.21,
+    "bytes": 1813968,
+    "slides": 5
+  },
+  {
+    "number": 9,
+    "title": "Workflows routing and parallel tasks",
+    "file": "09.mp4",
+    "seconds": 115.55,
+    "bytes": 1658748,
+    "slides": 5
+  },
+  {
+    "number": 10,
+    "title": "Retrieval ingestion and chunking",
+    "file": "10.mp4",
+    "seconds": 108.0,
+    "bytes": 1562386,
+    "slides": 5
+  },
+  {
+    "number": 11,
+    "title": "Embeddings vector search and hybrid retrieval",
+    "file": "11.mp4",
+    "seconds": 116.26,
+    "bytes": 1687653,
+    "slides": 5
+  },
+  {
+    "number": 12,
+    "title": "Grounded answers with retrieval augmented generation",
+    "file": "12.mp4",
+    "seconds": 111.06,
+    "bytes": 1639725,
+    "slides": 5
+  },
+  {
+    "number": 13,
+    "title": "Conversation memory and durable state",
+    "file": "13.mp4",
+    "seconds": 111.55,
+    "bytes": 1639313,
+    "slides": 5
+  },
+  {
+    "number": 14,
+    "title": "Prompt injection and secure agent boundaries",
+    "file": "14.mp4",
+    "seconds": 112.79,
+    "bytes": 1647524,
+    "slides": 5
+  },
+  {
+    "number": 15,
+    "title": "Human approval idempotency and actions",
+    "file": "15.mp4",
+    "seconds": 112.77,
+    "bytes": 1631975,
+    "slides": 5
+  },
+  {
+    "number": 16,
+    "title": "Evaluation datasets and regression testing",
+    "file": "16.mp4",
+    "seconds": 111.4,
+    "bytes": 1627818,
+    "slides": 5
+  },
+  {
+    "number": 17,
+    "title": "Resilience budgets and cost control",
+    "file": "17.mp4",
+    "seconds": 108.84,
+    "bytes": 1567152,
+    "slides": 5
+  },
+  {
+    "number": 18,
+    "title": "MCP and cooperation between agents",
+    "file": "18.mp4",
+    "seconds": 112.57,
+    "bytes": 1653794,
+    "slides": 5
+  },
+  {
+    "number": 19,
+    "title": "Observability deployment and operations",
+    "file": "19.mp4",
+    "seconds": 118.34,
+    "bytes": 1732695,
+    "slides": 5
+  },
+  {
+    "number": 20,
+    "title": "Capstone projects and interview preparation",
+    "file": "20.mp4",
+    "seconds": 128.15,
+    "bytes": 1911167,
+    "slides": 5
+  }
+]

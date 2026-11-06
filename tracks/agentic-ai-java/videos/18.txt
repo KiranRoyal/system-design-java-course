@@ -1,0 +1,19 @@
+Agentic AI with Java
+18 MCP and cooperation between agents
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+The Model Context Protocol standardizes how applications connect to tools and other context providers. It defines a transport and message contract; it does not make a server trustworthy or grant a user permission to access all advertised capabilities. Authenticate the connection, authorize each operation, and review the actual tool behavior.
+
+How to reason about it
+Multi-agent designs divide work into roles such as retrieval, drafting, and review. Their messages need explicit schemas, source provenance, deadlines, and a single authority for state-changing actions. Correlated model errors can survive several reviewers. Begin with a single bounded workflow and add agents only when measurement shows a benefit.
+
+Worked example
+A research worker can propose policy evidence, a support worker can draft an answer, and a verifier can check citations. None should approve a refund. A coordinator merges results under one task ID and rejects evidence outside the customer’s access scope. The supplied capstone uses one agent; MCP servers and cooperating agents are advanced extension projects.
+
+Practice and model answer
+Write an MCP tool contract for read-only order lookup and a threat model for an untrusted server. Then compare a single-agent answer with a three-stage workflow on the same evaluation cases. Record extra model calls, latency, task success, and failure modes. Keep credentials out of prompts and distinguish transport authentication from business authorization. If the multi-agent version is slower without a measurable quality gain, retain the simpler workflow.
+
+Interview check
+Question. Does MCP solve authorization? Answer. No. It standardizes interaction; the application and server must enforce access policy. Question. What prevents agents from endlessly delegating? Answer. A coordinator-owned task graph, bounded depth and calls, explicit completion criteria, and deadlines.

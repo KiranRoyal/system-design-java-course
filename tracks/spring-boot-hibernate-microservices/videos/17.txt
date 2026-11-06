@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+17 Service boundaries and domain ownership
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+A microservice owns a coherent business capability and its data. Splitting by technical layer, such as controller service and database service, often creates excessive coupling. Begin with domain boundaries, team ownership, consistency requirements, and deployment needs. A modular monolith can be a better starting point when independent deployment is not yet valuable.
+
+How to reason about it
+A service boundary introduces network failure, latency, versioning, and operational overhead. Keep contracts explicit and avoid cross-service database joins. Share identifiers and events rather than entity classes. A small shared library may reduce repetition, but a shared domain model can force services to upgrade together.
+
+Worked example
+Inventory owns products, stock, and reservations. Orders owns checkout intent, order status, and outbox events. Orders calls the inventory API with its order ID as the reservation identity. It does not query the inventory database or assume a distributed transaction spans both databases.
+
+Practice and model answer
+Design a commerce boundary map including catalog, inventory, orders, payment, and shipping. Identify which capabilities could remain modules in one application and which need independent scaling or ownership. Use concrete reasons for each split: independent release cadence, different availability needs, data ownership, or measured scaling pressure. Document the added failure modes and communication contracts. Do not create a service merely because a domain noun exists.
+
+Interview check
+Question. Why is a shared database risky for microservices? Answer. It allows hidden coupling and independent code changes to violate another service’s assumptions. Question. When would you prefer a modular monolith? Answer. When domain boundaries are still evolving or the team cannot justify the operational cost of independent services.

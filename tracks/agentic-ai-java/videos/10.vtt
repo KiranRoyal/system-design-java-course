@@ -1,0 +1,109 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:01.981
+Retrieval begins before the query.
+
+00:00:02.131 --> 00:00:07.187
+Ingest a document, retain its source and version, split it into meaningful
+
+00:00:07.187 --> 00:00:10.557
+chunks, attach access-control metadata, and index the result.
+
+00:00:10.707 --> 00:00:15.397
+Chunk size controls a tradeoff: small chunks can lose context, while large
+
+00:00:15.397 --> 00:00:18.914
+chunks can dilute relevance and consume more prompt space.
+
+00:00:19.064 --> 00:00:22.046
+Preserve headings and document boundaries where possible.
+
+00:00:22.196 --> 00:00:24.948
+The supplied Retriever is a lexical baseline.
+
+00:00:25.098 --> 00:00:30.687
+It lowercases words, calculates query-word overlap, filters by tenant, and returns a
+
+00:00:30.687 --> 00:00:32.085
+bounded ranked list.
+
+00:00:32.235 --> 00:00:35.843
+It is intentionally simple and cannot understand synonyms reliably.
+
+00:00:35.993 --> 00:00:40.187
+A baseline is useful because advanced retrieval should demonstrate an improvement on
+
+00:00:40.187 --> 00:00:41.934
+a fixed set of questions.
+
+00:00:42.084 --> 00:00:45.727
+A red-tenant policy chunk contains delayed order support review.
+
+00:00:45.877 --> 00:00:48.916
+A blue-tenant chunk contains private refund details.
+
+00:00:49.066 --> 00:00:51.693
+Searching as red excludes blue before ranking.
+
+00:00:51.843 --> 00:00:56.147
+The ranking cannot accidentally leak a highly similar blue document because that
+
+00:00:56.147 --> 00:00:58.299
+document never enters the candidate set.
+
+00:00:58.449 --> 00:01:02.963
+Create ten policy chunks and five questions with known relevant chunk IDs.
+
+00:01:03.113 --> 00:01:07.185
+Measure recall at three: the fraction of relevant chunks found among the
+
+00:01:07.185 --> 00:01:08.203
+first three results.
+
+00:01:08.353 --> 00:01:11.786
+Add a synonym-only question that the lexical baseline misses.
+
+00:01:11.936 --> 00:01:15.329
+Store relevance labels before changing the ranking function.
+
+00:01:15.479 --> 00:01:20.293
+Report per-question results and aggregate recall, including empty-result cases.
+
+00:01:20.443 --> 00:01:23.373
+Do not improve a metric by removing hard questions.
+
+00:01:23.523 --> 00:01:28.072
+Keep tenant isolation as a binary invariant independent of relevance quality.
+
+00:01:28.222 --> 00:01:28.894
+Question.
+
+00:01:29.044 --> 00:01:30.590
+Why keep source versions?
+
+00:01:30.740 --> 00:01:31.317
+Answer.
+
+00:01:31.467 --> 00:01:35.270
+An answer must be traceable to the policy that was active when
+
+00:01:35.270 --> 00:01:37.489
+it was produced, and updates need re-indexing.
+
+00:01:37.639 --> 00:01:38.311
+Question.
+
+00:01:38.461 --> 00:01:40.641
+Is chunk overlap always beneficial?
+
+00:01:40.791 --> 00:01:41.367
+Answer.
+
+00:01:41.517 --> 00:01:42.001
+No.
+
+00:01:42.151 --> 00:01:46.709
+It can preserve boundary context but also duplicates evidence and increases index
+
+00:01:46.709 --> 00:01:47.848
+and prompt size.

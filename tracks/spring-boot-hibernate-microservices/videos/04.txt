@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+04 Concurrency virtual threads and the JVM
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Concurrency allows work to overlap; parallelism means work executes at the same time on multiple processing resources. Shared mutable state requires coordination. A compound check followed by an update is not atomic merely because individual field reads are safe. Locks, atomic operations, immutable data, and message passing solve different coordination problems.
+
+How to reason about it
+Java 21 virtual threads reduce the cost of many blocking tasks, but they do not create unlimited database connections, sockets, or provider quota. Bound access to scarce dependencies separately. The JVM manages heap allocation and garbage collection; memory leaks still occur when objects remain reachable unnecessarily. Measure allocation, pauses, thread activity, and pool waits before tuning.
+
+Worked example
+InventoryTest launches twenty buyers using virtual threads. Database row locking, rather than the thread type, prevents overselling ten units. Replacing virtual threads with platform threads should preserve the business result. The experiment separates concurrency implementation from correctness authority.
+
+Practice and model answer
+Run 100 blocking read tasks with a semaphore allowing ten outbound calls. Record peak active calls and completion time. Add cancellation and ensure interrupted tasks restore or propagate interruption. The semaphore limits dependency pressure while virtual threads make waiting economical. A test should verify the peak active count, not only completion. Do not hold a database transaction while waiting for unrelated remote work.
+
+Interview check
+Question. Do virtual threads prevent races? Answer. No. Shared-state correctness still requires appropriate synchronization or transactional coordination. Question. Why can a service be slow with low CPU? Answer. It may be waiting on connections, locks, queues, disk, or downstream calls rather than executing CPU work.

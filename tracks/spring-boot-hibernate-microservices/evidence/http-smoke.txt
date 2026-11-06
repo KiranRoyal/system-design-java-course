@@ -1,0 +1,13 @@
+PASS seed product and stock
+PASS real two-service checkout
+PASS idempotent order replay
+PASS one inventory effect
+PASS different intent conflicts
+PASS bean validation rejects zero quantity
+PASS read order DTO
+PASS missing order
+PASS bounded pagination
+PASS missing inventory product
+PASS insufficient stock
+PASS failed calls leave stock unchanged
+HTTP checks passed: 12

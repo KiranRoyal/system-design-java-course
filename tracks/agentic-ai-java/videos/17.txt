@@ -1,0 +1,19 @@
+Agentic AI with Java
+17 Resilience budgets and cost control
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Agent latency includes every model request, tool call, queue wait, and retry. A three-step agent can be much slower than one completion. Propagate a total deadline and reserve enough time for final response assembly. Use finite retries with jitter for retryable failures, and avoid automatically retrying non-idempotent actions.
+
+How to reason about it
+Concurrency limits protect model providers, database pools, and tool services. A circuit breaker can temporarily stop calls to a failing dependency. Rate limits and token budgets protect spend. Cache only results whose scope, freshness, and privacy rules are understood; a cache key that omits tenant identity can become a data leak.
+
+Worked example
+OllamaModel has a connection timeout and request timeout. Agent checks its total deadline between steps. If the provider returns 503, the lab fails clearly instead of treating the body as a model answer. The teaching adapter does not implement automatic retries, which keeps the failure path explicit for the first exercises.
+
+Practice and model answer
+Simulate a slow model endpoint and a 503 response. Add at most one retry for a read-only model request, with a remaining-budget check. Measure how retry traffic behaves under ten concurrent users. Stop when the remaining budget cannot support another attempt. Avoid retrying validation errors or unauthorized requests. Compare success rate against added traffic and latency. A successful retry policy should improve useful outcomes without amplifying an outage into uncontrolled load.
+
+Interview check
+Question. What is the unit of AI cost optimization? Answer. Cost per successfully completed task under the required quality and safety constraints, not merely cost per token. Question. Why can retries make outages worse? Answer. They multiply traffic when the dependency has the least spare capacity.

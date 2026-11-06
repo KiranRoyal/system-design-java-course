@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+09 Validation error handling and problem details
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Validation occurs at several layers. Bean Validation checks request shape and ranges, domain methods enforce business invariants, and database constraints protect persisted state under concurrency. None completely replaces the others. A request may pass field validation but still conflict with current stock or a previously used idempotency key.
+
+How to reason about it
+Return stable error categories without leaking SQL, stack traces, or credentials. Problem Details gives an interoperable structure for HTTP errors. Include useful client information such as which field is invalid and a correlation identifier, while detailed internal diagnostics stay in protected logs.
+
+Worked example
+ReserveRequest requires a positive product ID and a quantity between one and one thousand. InventoryService rechecks its own boundary because it can also be called outside HTTP. A database check constraint prevents negative stock. Conflicts become 409; missing products become 404; invalid arguments become 400.
+
+Practice and model answer
+Send malformed JSON, quantity zero, an unknown product, and a repeated key with a different quantity. Write down the expected status and verify it with the provided HTTP smoke test or Postman collection. Malformed or invalid input should return 400, unknown product 404, and a conflicting key 409. Confirm that failed requests do not alter stock or create orders. Avoid a catch-all handler that converts every programming defect into a misleading client error.
+
+Interview check
+Question. Why validate again in a service? Answer. Services may be invoked by jobs, tests, or other code that bypasses the HTTP validator. Question. Why keep database constraints? Answer. They enforce invariants at the durable shared boundary even when concurrent callers or another application bypass application checks.

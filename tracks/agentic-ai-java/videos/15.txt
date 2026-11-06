@@ -1,0 +1,19 @@
+Agentic AI with Java
+15 Human approval idempotency and actions
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Approval should bind a human’s decision to an exact action: account, resource, amount, parameters, expiry, and unique identifier. A generic yes in a conversation is ambiguous when proposals change. Store the proposal server-side and compare the approved version with the stored version. Recheck current business eligibility immediately before execution.
+
+How to reason about it
+Retries are inevitable. Use a stable idempotency key for one logical effect and persist the effect record atomically where possible. A timeout from an external provider means the outcome may be unknown. Query or reconcile using the same provider key before issuing another effect. Human approval does not solve duplicate delivery by itself.
+
+Worked example
+ApprovalLedger stores a proposal and accepts only the exact same record from the matching human context. One hundred concurrent approvals produce one simulated receipt. The ledger is in memory and does not call a payment provider, so it demonstrates identity binding and same-process idempotency, not durable refund processing.
+
+Practice and model answer
+Extend the ledger with a database schema for proposal and execution states. Define how to recover after a crash between provider success and local receipt storage. Include a changed-amount attack in the tests. Persist the exact proposal, human identity, approval version, and provider idempotency key. After restart, reconcile an IN_PROGRESS or UNKNOWN execution with the provider. Never create a new key merely because the previous HTTP call timed out. Eligibility checks and amount limits remain separate from approval storage.
+
+Interview check
+Question. Why must approval expire? Answer. The business state and user intent may change; a stale approval should not grant indefinite authority. Question. Does synchronized provide crash safety? Answer. No. It coordinates threads in one process and loses its in-memory state on restart.

@@ -1,0 +1,115 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.270
+A tool loop alternates between a model decision and application execution.
+
+00:00:04.420 --> 00:00:09.816
+Each iteration consumes time, tokens, and possibly a scarce downstream resource.
+
+00:00:09.966 --> 00:00:14.716
+Define a maximum number of model calls, a deadline, input and output
+
+00:00:14.716 --> 00:00:17.091
+limits, and a successful stopping condition.
+
+00:00:17.241 --> 00:00:20.557
+The lab allows at most five model calls in Main and rejects
+
+00:00:20.557 --> 00:00:22.768
+an unfinished loop when its budget is exhausted.
+
+00:00:22.918 --> 00:00:26.398
+A deadline check between steps does not interrupt a blocked call.
+
+00:00:26.548 --> 00:00:31.480
+Network adapters need their own connection and response timeouts, and tool implementations
+
+00:00:31.480 --> 00:00:33.124
+must avoid unbounded blocking.
+
+00:00:33.274 --> 00:00:36.940
+A thread interrupt is cooperative, not a universal kill switch.
+
+00:00:37.090 --> 00:00:41.310
+Bound the work at every dependency boundary and distinguish a partial result
+
+00:00:41.310 --> 00:00:42.366
+from completed success.
+
+00:00:42.516 --> 00:00:45.473
+A defective model may request lookupOrder forever.
+
+00:00:45.623 --> 00:00:49.742
+AgentTest runs this behavior and expects a budget-exhausted exception.
+
+00:00:49.892 --> 00:00:53.982
+A tool may return too much text; the engine rejects it rather
+
+00:00:53.982 --> 00:00:55.345
+than growing history indefinitely.
+
+00:00:55.495 --> 00:01:00.200
+The current HTTP adapter checks response size after buffering, so a production
+
+00:01:00.200 --> 00:01:03.728
+ingress limit or streaming cap remains a hardening task.
+
+00:01:03.878 --> 00:01:06.680
+Make a model return the same tool request forever.
+
+00:01:06.830 --> 00:01:10.848
+Then implement a repeated-action detector and compare it with the absolute call
+
+00:01:10.848 --> 00:01:11.183
+limit.
+
+00:01:11.333 --> 00:01:13.315
+Explain why both may be useful.
+
+00:01:13.465 --> 00:01:16.647
+The call limit guarantees a finite number of decisions.
+
+00:01:16.797 --> 00:01:22.061
+A repeated-action detector can stop waste earlier, but identical calls may legitimately
+
+00:01:22.061 --> 00:01:23.377
+produce changed results.
+
+00:01:23.527 --> 00:01:27.403
+Include arguments and relevant state in the detector and retain the absolute
+
+00:01:27.403 --> 00:01:29.341
+budget as the reliable outer bound.
+
+00:01:29.491 --> 00:01:30.162
+Question.
+
+00:01:30.312 --> 00:01:32.721
+Does a circuit breaker replace a deadline?
+
+00:01:32.872 --> 00:01:33.448
+Answer.
+
+00:01:33.598 --> 00:01:34.082
+No.
+
+00:01:34.232 --> 00:01:38.859
+A breaker controls admission after failures; each admitted call still needs a
+
+00:01:38.859 --> 00:01:39.244
+timeout.
+
+00:01:39.394 --> 00:01:40.065
+Question.
+
+00:01:40.215 --> 00:01:42.563
+What is a correct budget-exhausted result?
+
+00:01:42.713 --> 00:01:43.290
+Answer.
+
+00:01:43.440 --> 00:01:48.881
+A controlled incomplete outcome with useful available evidence, not a fabricated successful
+
+00:01:48.881 --> 00:01:49.335
+answer.

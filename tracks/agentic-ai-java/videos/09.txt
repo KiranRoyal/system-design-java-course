@@ -1,0 +1,19 @@
+Agentic AI with Java
+09 Workflows routing and parallel tasks
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+A workflow uses application-defined control flow. Common patterns include a sequence of transformations, routing by request type, parallel independent lookups, and a review step before completion. An agent can be placed inside one stage rather than controlling the entire system. This limits the scope of uncertainty and makes recovery easier to explain.
+
+How to reason about it
+Parallelize independent reads only when they improve end-to-end latency. Limit concurrency with a semaphore or executor capacity, and give every branch a deadline. Do not concurrently execute dependent actions such as reserving stock before validating the product. A failed optional lookup can produce a partial answer; a failed mandatory authorization check must stop the operation.
+
+Worked example
+A support workflow first validates the signed-in user, then reads an order and a public policy in parallel, then generates an explanation. Refund execution remains outside this workflow. If policy retrieval fails, the system may report the order status while clearly saying the next-step policy is unavailable. It must not silently assume approval.
+
+Practice and model answer
+Implement two bounded read tasks using Java 21 virtual threads. Give one task a delayed response and record total latency. Define which failures permit a partial response. Use a deadline shared by both futures and cancel unfinished work when the response is no longer useful. Restore interrupt status when handling interruption. Limit outbound concurrency independently of the number of virtual threads. A test should verify the partial-result contract, not only that two tasks started.
+
+Interview check
+Question. When is parallelization wrong? Answer. When steps depend on prior results, share an unsafe resource, or overload a constrained dependency. Question. Does adding more agents guarantee a better answer? Answer. No. It adds coordination, latency, and correlated error opportunities; compare against a simpler baseline.

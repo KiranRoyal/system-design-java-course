@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+07 Spring Boot configuration and application startup
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Spring Boot assembles a Spring application using starters, auto-configuration, and external configuration. Auto-configuration reacts to classes, properties, and existing beans; it is not magic and can be inspected when behavior is unexpected. Use the dependency management supplied by the chosen Boot release instead of independently mixing framework versions.
+
+How to reason about it
+Keep environment-specific values outside source code. Profiles can select local and PostgreSQL settings, while environment variables supply connection details. Validate required configuration at startup. Secrets should come from an appropriate secret store or injected environment, never a committed repository file.
+
+Worked example
+Both services pin Boot 4.0.9 and Java 21. The default profile binds only to 127.0.0.1 and uses an in-memory H2 database. The postgres profile reads DB_URL, DB_USER, and DB_PASSWORD. Flyway creates the schema, while Hibernate validates that the mappings match it. Restarting the default profile resets its data.
+
+Practice and model answer
+Run a service with a different port supplied on the command line. Then intentionally provide an invalid database URL and inspect the startup failure. Explain which settings should vary between development and production. Ports, database endpoints, credentials, timeouts, and observability destinations vary by environment. Business invariants should not silently change through profiles. Keep a documented configuration contract and avoid copying production credentials into a local properties file.
+
+Interview check
+Question. What does a starter provide? Answer. A coordinated dependency set and configuration integration for a capability such as web MVC or JPA. Question. Why pin a compatible version family? Answer. It reduces untested combinations of Spring, Hibernate, Jackson, and other managed dependencies.

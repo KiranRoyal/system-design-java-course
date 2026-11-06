@@ -1,0 +1,143 @@
+1
+00:00:00,000 --> 00:00:02,818
+Evaluate an AI application at several layers.
+
+2
+00:00:02,968 --> 00:00:07,047
+Unit tests check deterministic code such as authorization and loop limits.
+
+3
+00:00:07,197 --> 00:00:11,513
+Adapter tests check request and response contracts over HTTP.
+
+4
+00:00:11,663 --> 00:00:15,386
+Retrieval tests measure whether relevant authorized evidence is found.
+
+5
+00:00:15,536 --> 00:00:23,173
+End-to-end evaluations measure task success, unsupported claims, appropriate abstention, latency, and cost.
+
+6
+00:00:23,323 --> 00:00:29,541
+Keep a versioned dataset containing normal requests, edge cases, adversarial inputs, and
+
+7
+00:00:29,541 --> 00:00:30,577
+expected properties.
+
+8
+00:00:30,727 --> 00:00:35,015
+Do not tune on the entire evaluation set; reserve holdout cases.
+
+9
+00:00:35,165 --> 00:00:38,492
+A model grader can be useful but may share the same biases
+
+10
+00:00:38,492 --> 00:00:40,433
+or mistakes as the model under test.
+
+11
+00:00:40,583 --> 00:00:43,880
+Calibrate it against human judgments and report disagreement.
+
+12
+00:00:44,030 --> 00:00:47,845
+The supplied JUnit suite proves that unknown tools are rejected and another
+
+13
+00:00:47,845 --> 00:00:49,116
+tenant’s order is hidden.
+
+14
+00:00:49,266 --> 00:00:52,863
+It does not prove that an arbitrary local model gives good answers.
+
+15
+00:00:53,013 --> 00:00:56,949
+Run the same support questions through scripted mode and live mode, record
+
+16
+00:00:56,949 --> 00:01:00,886
+the model version and prompt hash, and compare evidence support rather than
+
+17
+00:01:00,886 --> 00:01:01,542
+wording alone.
+
+18
+00:01:01,692 --> 00:01:07,627
+Build a CSV with 30 cases and columns for tool accuracy, groundedness,
+
+19
+00:01:07,627 --> 00:01:11,089
+access violations, calls, elapsed milliseconds, and tokens.
+
+20
+00:01:11,239 --> 00:01:14,300
+Define a release threshold before running the experiment.
+
+21
+00:01:14,450 --> 00:01:18,384
+Treat any access violation as a release blocker rather than averaging it
+
+22
+00:01:18,384 --> 00:01:18,711
+away.
+
+23
+00:01:18,861 --> 00:01:24,120
+Report task success with numerator and denominator, and keep cost and latency
+
+24
+00:01:24,120 --> 00:01:24,558
+distributions.
+
+25
+00:01:24,708 --> 00:01:29,164
+A threshold such as 90 percent success is a project choice, not
+
+26
+00:01:29,164 --> 00:01:30,649
+a universal industry standard.
+
+27
+00:01:30,799 --> 00:01:31,471
+Question.
+
+28
+00:01:31,621 --> 00:01:34,235
+Why is exact string matching often inadequate?
+
+29
+00:01:34,385 --> 00:01:34,962
+Answer.
+
+30
+00:01:35,112 --> 00:01:40,269
+Several phrasings can express the same supported answer; compare required facts and
+
+31
+00:01:40,269 --> 00:01:41,129
+prohibited behavior.
+
+32
+00:01:41,279 --> 00:01:41,950
+Question.
+
+33
+00:01:42,100 --> 00:01:44,332
+What does a mocked model test establish?
+
+34
+00:01:44,482 --> 00:01:45,059
+Answer.
+
+35
+00:01:45,209 --> 00:01:50,391
+It establishes orchestration behavior for supplied decisions, not the quality of real
+
+36
+00:01:50,391 --> 00:01:51,255
+model decisions.

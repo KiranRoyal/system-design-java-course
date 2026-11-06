@@ -1,0 +1,115 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.674
+A tool is a small capability with a name, input contract, output
+
+00:00:04.674 --> 00:00:06.232
+contract, and defined effect.
+
+00:00:06.382 --> 00:00:10.902
+Narrow tools are easier to authorize and test than a generic database
+
+00:00:10.902 --> 00:00:12.786
+query or unrestricted HTTP fetch.
+
+00:00:12.936 --> 00:00:16.399
+Separate read operations from actions that alter business state.
+
+00:00:16.549 --> 00:00:21.316
+Tool descriptions help the model select a capability; Java code must enforce
+
+00:00:21.316 --> 00:00:22.110
+its constraints.
+
+00:00:22.260 --> 00:00:28.421
+Derive tenant, user, permissions, and correlation identifiers from trusted request context.
+
+00:00:28.571 --> 00:00:31.446
+Never let the model choose which account it represents.
+
+00:00:31.596 --> 00:00:35.376
+Apply authorization at the data access boundary as well as at the
+
+00:00:35.376 --> 00:00:35.691
+UI.
+
+00:00:35.841 --> 00:00:40.208
+Keep tool output small and include a stable source identifier so later
+
+00:00:40.208 --> 00:00:42.028
+explanations can point to evidence.
+
+00:00:42.178 --> 00:00:47.122
+lookupOrder receives orderId, finds the synthetic order, and checks both tenant and
+
+00:00:47.122 --> 00:00:47.535
+owner.
+
+00:00:47.685 --> 00:00:52.335
+An unknown order and an inaccessible order return the same public message,
+
+00:00:52.335 --> 00:00:53.498
+limiting account enumeration.
+
+00:00:53.648 --> 00:00:59.101
+searchPolicy is deliberately a fixed policy fixture; the retrieval module later teaches
+
+00:00:59.101 --> 00:01:00.919
+a searchable document collection.
+
+00:01:01.069 --> 00:01:03.688
+Neither fixture is a live commerce integration.
+
+00:01:03.838 --> 00:01:05.739
+Design a delivery-estimate tool.
+
+00:01:05.889 --> 00:01:11.654
+Specify allowed inputs, the trusted identity source, maximum response size, timeout, and
+
+00:01:11.654 --> 00:01:15.016
+behavior when the delivery service is unavailable.
+
+00:01:15.166 --> 00:01:19.854
+Accept an order identifier, then resolve the authorized shipment server-side.
+
+00:01:20.004 --> 00:01:24.586
+Return an estimate with timestamp and source, or a typed unavailable result.
+
+00:01:24.736 --> 00:01:27.623
+Reject arbitrary URLs and customer IDs.
+
+00:01:27.773 --> 00:01:31.612
+Use a finite deadline and do not replace missing delivery data with
+
+00:01:31.612 --> 00:01:32.572
+an invented date.
+
+00:01:32.722 --> 00:01:33.393
+Question.
+
+00:01:33.543 --> 00:01:35.613
+Why avoid a generic SQL tool?
+
+00:01:35.763 --> 00:01:36.339
+Answer.
+
+00:01:36.489 --> 00:01:40.899
+Its authority is broad, schema exposure can be large, and safely constraining
+
+00:01:40.899 --> 00:01:43.104
+queries and effects is much harder.
+
+00:01:43.254 --> 00:01:43.925
+Question.
+
+00:01:44.075 --> 00:01:45.970
+Where should tenant filtering occur?
+
+00:01:46.120 --> 00:01:46.696
+Answer.
+
+00:01:46.846 --> 00:01:51.466
+At the trusted query or service boundary before data reaches the model,
+
+00:01:51.466 --> 00:01:53.391
+with downstream authorization still enforced.

@@ -1,0 +1,112 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.449
+Every remote call can fail before sending, during processing, or after the
+
+00:00:04.449 --> 00:00:07.044
+server commits but before the reply arrives.
+
+00:00:07.194 --> 00:00:11.599
+Configure connection and response timeouts and fit them within a total request
+
+00:00:11.599 --> 00:00:11.966
+deadline.
+
+00:00:12.116 --> 00:00:16.143
+A retry is safe only when the operation’s semantics and identity support
+
+00:00:16.143 --> 00:00:16.478
+it.
+
+00:00:16.628 --> 00:00:20.952
+Use bounded attempts with backoff and jitter for genuinely retryable failures.
+
+00:00:21.102 --> 00:00:25.911
+Circuit breakers reduce calls to a failing dependency, while bulkheads limit how
+
+00:00:25.911 --> 00:00:28.315
+much capacity one dependency can occupy.
+
+00:00:28.465 --> 00:00:30.446
+Neither creates business correctness.
+
+00:00:30.596 --> 00:00:34.772
+Avoid holding database locks or transactions across slow network calls.
+
+00:00:34.922 --> 00:00:39.492
+Record unknown outcomes explicitly instead of guessing that a timeout means rejection.
+
+00:00:39.642 --> 00:00:44.470
+InventoryClient uses a one-second connection timeout and a two-second read timeout.
+
+00:00:44.620 --> 00:00:49.670
+A 409 or 404 becomes a known rejection; transport failures and server
+
+00:00:49.670 --> 00:00:50.932
+errors remain UNKNOWN.
+
+00:00:51.082 --> 00:00:55.762
+OrderService leaves the order PENDING and can reconcile by repeating the same
+
+00:00:55.762 --> 00:00:56.542
+reservation identity.
+
+00:00:56.692 --> 00:01:00.556
+A test exercises an actual delayed HTTP response.
+
+00:01:00.706 --> 00:01:04.916
+Run the inventory mock in success, outage, and delayed scenarios.
+
+00:01:05.066 --> 00:01:07.030
+Start orders against that endpoint.
+
+00:01:07.180 --> 00:01:11.475
+Verify that a timeout produces PENDING and that retrying after recovery confirms
+
+00:01:11.475 --> 00:01:12.549
+the same order.
+
+00:01:12.699 --> 00:01:16.343
+Preserve the idempotency key and order ID across attempts.
+
+00:01:16.493 --> 00:01:19.504
+Do not translate a timeout into insufficient stock.
+
+00:01:19.654 --> 00:01:24.052
+Measure the elapsed time and verify that the HTTP client’s timeout is
+
+00:01:24.052 --> 00:01:24.418
+active.
+
+00:01:24.568 --> 00:01:29.584
+The mock demonstrates caller behavior; the real inventory smoke test verifies the
+
+00:01:29.584 --> 00:01:30.420
+normal integration.
+
+00:01:30.570 --> 00:01:31.242
+Question.
+
+00:01:31.392 --> 00:01:32.823
+What is a retry storm?
+
+00:01:32.973 --> 00:01:33.549
+Answer.
+
+00:01:33.699 --> 00:01:39.276
+Many callers repeatedly retrying a failing dependency, multiplying load and delaying recovery.
+
+00:01:39.426 --> 00:01:40.098
+Question.
+
+00:01:40.248 --> 00:01:42.700
+Why keep the order pending after a timeout?
+
+00:01:42.850 --> 00:01:43.426
+Answer.
+
+00:01:43.576 --> 00:01:48.450
+Inventory may have reserved stock even though the response was lost; reconciliation
+
+00:01:48.450 --> 00:01:49.262
+is required.

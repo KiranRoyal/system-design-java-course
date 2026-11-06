@@ -1,0 +1,19 @@
+Agentic AI with Java
+13 Conversation memory and durable state
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Conversation history helps resolve references such as that order, but it is not an authoritative business database. Separate recent message history, summaries, durable user preferences, and workflow state. Each has a different retention period and trust level. A summary is a generated interpretation and may omit details needed for an approval or audit.
+
+How to reason about it
+Scope memory to authenticated users and tenants, limit its size, and support expiration and deletion. Avoid storing secrets or unnecessary personal information in prompts and logs. Durable workflow state should record exact identifiers, versions, statuses, and completed effects rather than relying on a natural-language summary.
+
+Worked example
+A user asks about A100 and then says cancel it. The application must resolve it to the correct authorized order, fetch current state, and apply cancellation rules. A memory entry saying user approved cancellation yesterday cannot authorize a new action today. The supplied engine keeps only one run’s bounded history and has no cross-session memory.
+
+Practice and model answer
+Design a memory record with tenant, user, conversation ID, creation time, expiry, and source. Write tests for two users with the same conversation ID in different tenants and for expired entries. Use a composite namespace or equivalent authorization predicate. Expired entries must not appear in assembled prompts. Recheck source data before a state-changing action. A deletion request must cover indexes, summaries, and backups according to the chosen retention policy.
+
+Interview check
+Question. Why not save the entire transcript forever? Answer. It increases cost, privacy exposure, stale instructions, and irrelevant context. Question. Can a model-generated summary authorize a payment? Answer. No. Authorization must refer to exact trusted state and the specific permitted action.

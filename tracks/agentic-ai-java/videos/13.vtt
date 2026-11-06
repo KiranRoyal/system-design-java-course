@@ -1,0 +1,109 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.581
+Conversation history helps resolve references such as that order, but it is
+
+00:00:04.581 --> 00:00:06.490
+not an authoritative business database.
+
+00:00:06.640 --> 00:00:12.367
+Separate recent message history, summaries, durable user preferences, and workflow state.
+
+00:00:12.517 --> 00:00:15.278
+Each has a different retention period and trust level.
+
+00:00:15.428 --> 00:00:19.257
+A summary is a generated interpretation and may omit details needed for
+
+00:00:19.257 --> 00:00:20.534
+an approval or audit.
+
+00:00:20.684 --> 00:00:25.766
+Scope memory to authenticated users and tenants, limit its size, and support
+
+00:00:25.766 --> 00:00:27.037
+expiration and deletion.
+
+00:00:27.187 --> 00:00:31.851
+Avoid storing secrets or unnecessary personal information in prompts and logs.
+
+00:00:32.001 --> 00:00:37.849
+Durable workflow state should record exact identifiers, versions, statuses, and completed effects
+
+00:00:37.849 --> 00:00:41.260
+rather than relying on a natural-language summary.
+
+00:00:41.410 --> 00:00:44.635
+A user asks about A100 and then says cancel it.
+
+00:00:44.785 --> 00:00:49.545
+The application must resolve it to the correct authorized order, fetch current
+
+00:00:49.545 --> 00:00:51.529
+state, and apply cancellation rules.
+
+00:00:51.679 --> 00:00:56.135
+A memory entry saying user approved cancellation yesterday cannot authorize a new
+
+00:00:56.135 --> 00:00:56.877
+action today.
+
+00:00:57.027 --> 00:01:00.959
+The supplied engine keeps only one run’s bounded history and has no
+
+00:01:00.959 --> 00:01:01.614
+cross-session memory.
+
+00:01:01.764 --> 00:01:07.831
+Design a memory record with tenant, user, conversation ID, creation time, expiry,
+
+00:01:07.831 --> 00:01:08.842
+and source.
+
+00:01:08.992 --> 00:01:12.899
+Write tests for two users with the same conversation ID in different
+
+00:01:12.899 --> 00:01:14.526
+tenants and for expired entries.
+
+00:01:14.676 --> 00:01:18.384
+Use a composite namespace or equivalent authorization predicate.
+
+00:01:18.534 --> 00:01:21.654
+Expired entries must not appear in assembled prompts.
+
+00:01:21.804 --> 00:01:24.691
+Recheck source data before a state-changing action.
+
+00:01:24.841 --> 00:01:30.050
+A deletion request must cover indexes, summaries, and backups according to the
+
+00:01:30.050 --> 00:01:31.352
+chosen retention policy.
+
+00:01:31.502 --> 00:01:32.173
+Question.
+
+00:01:32.323 --> 00:01:34.949
+Why not save the entire transcript forever?
+
+00:01:35.099 --> 00:01:35.676
+Answer.
+
+00:01:35.826 --> 00:01:41.558
+It increases cost, privacy exposure, stale instructions, and irrelevant context.
+
+00:01:41.708 --> 00:01:42.380
+Question.
+
+00:01:42.530 --> 00:01:45.363
+Can a model-generated summary authorize a payment?
+
+00:01:45.513 --> 00:01:46.089
+Answer.
+
+00:01:46.239 --> 00:01:46.723
+No.
+
+00:01:46.873 --> 00:01:51.404
+Authorization must refer to exact trusted state and the specific permitted action.

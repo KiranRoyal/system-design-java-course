@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+13 Entity relationships ownership and aggregates
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Relationships map object references to foreign keys or join tables. The owning side determines which mapping writes the relationship. For a typical one-to-many and many-to-one pair, the many-to-one side owns the foreign key, while mappedBy identifies the inverse collection. Keep both object sides consistent through helper methods.
+
+How to reason about it
+Cascade controls which entity operations propagate; it is not database foreign-key cascading and does not mean every relationship should use CascadeType.ALL. Orphan removal deletes children removed from an owned collection and should match aggregate semantics. Avoid cascading removal from an order to a shared product.
+
+Worked example
+The supplied checkout starts with one product per order to keep distributed behavior visible. The relationship extension adds OrderLine children owned by PurchaseOrder, with each line storing a product identifier and price snapshot. Product remains owned by inventory and is not a JPA relationship across services.
+
+Practice and model answer
+Implement OrderLine with quantity and price snapshot. Add a helper that sets both order.lines and line.order. Test adding a line, removing a line, and deleting an order without deleting any catalog product. Use aggregate ownership for cascade decisions. A line belongs to one order and may be deleted with it; a product is shared and independently managed. Add migrations and test foreign-key behavior. Do not expose the bidirectional graph directly as JSON.
+
+Interview check
+Question. What does mappedBy mean? Answer. It names the property on the owning side of a bidirectional relationship; it is not the database column name. Question. Why store a price snapshot on an order line? Answer. The order must preserve the agreed purchase price even when the catalog price later changes.

@@ -1,0 +1,147 @@
+1
+00:00:00,000 --> 00:00:05,509
+Java records represent small data carriers such as Context, Decision, and Result.
+
+2
+00:00:05,659 --> 00:00:10,011
+An interface separates a capability from its implementation: Agent.Model can be backed
+
+3
+00:00:10,011 --> 00:00:14,363
+by a queue for tests or an HTTP adapter for live inference.
+
+4
+00:00:14,513 --> 00:00:19,494
+Constructor injection makes dependencies explicit and allows a fixed clock in tests.
+
+5
+00:00:19,644 --> 00:00:25,051
+Exceptions represent rejected input, exhausted budgets, and dependency failures.
+
+6
+00:00:25,201 --> 00:00:27,934
+Use immutable snapshots across boundaries.
+
+7
+00:00:28,084 --> 00:00:32,963
+List.copyOf prevents a model adapter from changing the engine’s history collection, although
+
+8
+00:00:32,963 --> 00:00:36,622
+it does not magically make arbitrary nested objects immutable.
+
+9
+00:00:36,772 --> 00:00:39,470
+Map.copyOf rejects null keys and values.
+
+10
+00:00:39,620 --> 00:00:44,594
+Keep account identity in trusted application context rather than accepting it from
+
+11
+00:00:44,594 --> 00:00:45,424
+generated text.
+
+12
+00:00:45,574 --> 00:00:50,470
+Generic collections preserve types at compile time, while JSON entering from a
+
+13
+00:00:50,470 --> 00:00:52,510
+network still needs runtime validation.
+
+14
+00:00:52,660 --> 00:00:56,013
+Agent.run receives Context with tenant red and user alice.
+
+15
+00:00:56,163 --> 00:00:59,498
+SupportTools gets that same context for every tool call.
+
+16
+00:00:59,648 --> 00:01:04,277
+A generated tenant field is rejected because lookupOrder accepts only orderId.
+
+17
+00:01:04,427 --> 00:01:08,245
+This separation is more valuable than putting an instruction saying never read
+
+18
+00:01:08,245 --> 00:01:09,836
+another tenant in the prompt.
+
+19
+00:01:09,986 --> 00:01:13,158
+Find every mutable collection in Agent and ApprovalLedger.
+
+20
+00:01:13,308 --> 00:01:16,121
+Add a test that a model cannot add a message to its
+
+21
+00:01:16,121 --> 00:01:16,590
+input history.
+
+22
+00:01:16,740 --> 00:01:19,907
+Explain why synchronized is used in the in-memory ledger.
+
+23
+00:01:20,057 --> 00:01:23,829
+The engine owns its ArrayList and gives the model an immutable snapshot.
+
+24
+00:01:23,979 --> 00:01:29,413
+The ledger synchronizes a compound check-and-record operation so concurrent approvals produce one
+
+25
+00:01:29,413 --> 00:01:29,866
+receipt.
+
+26
+00:01:30,016 --> 00:01:35,922
+This protects one JVM only; durable cross-instance coordination requires a database transaction
+
+27
+00:01:35,922 --> 00:01:37,399
+or equivalent authority.
+
+28
+00:01:37,549 --> 00:01:38,220
+Question.
+
+29
+00:01:38,370 --> 00:01:39,591
+Why inject Clock?
+
+30
+00:01:39,741 --> 00:01:40,318
+Answer.
+
+31
+00:01:40,468 --> 00:01:45,097
+Expiry and deadlines become deterministic test inputs instead of tests that sleep.
+
+32
+00:01:45,247 --> 00:01:45,919
+Question.
+
+33
+00:01:46,069 --> 00:01:48,641
+Does a record make all contained data immutable?
+
+34
+00:01:48,791 --> 00:01:49,367
+Answer.
+
+35
+00:01:49,517 --> 00:01:50,001
+No.
+
+36
+00:01:50,151 --> 00:01:54,182
+Its references are final, but a mutable collection held by a record
+
+37
+00:01:54,182 --> 00:01:56,870
+can still change unless copied or wrapped appropriately.

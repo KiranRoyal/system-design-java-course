@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+22 Authentication authorization and service security
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Authentication establishes identity; authorization decides whether that identity may perform an operation on a resource. Validate token signatures, issuer, audience, and expiry using maintained security libraries. Do not merely decode a JWT and trust its claims. Role checks alone may be insufficient when ownership or tenant boundaries matter.
+
+How to reason about it
+Enforce authorization in the service that owns the data, even when a gateway already checked the request. Protect secrets, restrict CORS deliberately, validate input, and use TLS outside a local environment. CSRF concerns depend on how credentials are attached by browsers; disabling it without understanding the authentication model is unsafe.
+
+Worked example
+The supplied commerce services are explicitly local learning apps, bound to loopback, with synthetic data and no authentication. Before exposing them, add an OAuth2 resource-server configuration, account ownership, tenant-scoped idempotency, and tests for cross-account reads and writes. The AI track separately demonstrates trusted tenant checks in its tool boundary.
+
+Practice and model answer
+Add a secured profile using a local identity provider or test JWT decoder. Test missing token, wrong issuer, wrong audience, expired token, insufficient role, and another user’s order. Keep the default local demo limitations documented. Use Spring Security’s resource-server support and explicit authorization rules. Derive tenant identity from validated claims mapped by trusted configuration. Test resource ownership independently of role membership. Do not commit credentials or signing keys to the course repository.
+
+Interview check
+Question. What is the difference between 401 and 403? Answer. 401 indicates missing or invalid authentication; 403 indicates the authenticated caller lacks permission, subject to deliberate resource-hiding policies. Question. Why is gateway-only authorization insufficient? Answer. Internal calls, misconfiguration, or alternate routes can bypass the gateway; the data-owning service must enforce its own policy.

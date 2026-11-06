@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+20 Transactional outbox messaging and consumers
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+A transactional outbox stores a business change and an event record in the same local transaction. A relay later publishes the event to a broker. This closes the loss window where a database commit succeeds but event publication never happens. It does not eliminate duplicates: a relay may publish successfully and crash before recording completion.
+
+How to reason about it
+Consumers must make duplicate delivery safe. Store the event ID and local effect in one transaction where possible. Partition ordering applies within the broker’s ordering boundary, not globally across all messages. Design event schemas for compatibility and keep event payloads focused on stable business facts.
+
+Worked example
+OrderTransactions.complete changes a pending order to CONFIRMED or REJECTED and inserts an outbox event in the same transaction. Repeating completion does not add a second event. The supplied project stores the outbox but does not ship a broker relay; implementing and crash-testing that relay is the advanced messaging exercise.
+
+Practice and model answer
+Implement a relay with bounded batches and a deduplicating consumer. Inject a crash after publish but before acknowledgement storage. Restart and demonstrate that the event may repeat while the consumer’s business effect remains single. Use stable event IDs and durable consumer deduplication. If the consumer calls an external provider, local deduplication alone is insufficient; use provider idempotency and reconciliation. State the exact effect and failure model before using the phrase exactly once.
+
+Interview check
+Question. What does the outbox guarantee? Answer. The local business change and event record commit together, assuming the database transaction succeeds. Question. Why can outbox delivery repeat? Answer. Publishing and recording relay progress are separate operations, leaving a crash window.

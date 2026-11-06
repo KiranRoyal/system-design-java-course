@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+10 Testing from domain rules to HTTP boundaries
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Choose tests by the risk they address. Pure unit tests verify calculations and branching quickly. Persistence tests verify mappings, transactions, constraints, and queries. HTTP integration tests verify serialization, validation, status codes, and the actual client-server contract. End-to-end tests verify a small number of important complete workflows.
+
+How to reason about it
+A mock proves how a caller handles a supplied response; it does not prove the real dependency behaves that way. Match mocks to the contract and separately exercise the real service. Concurrency and crash-recovery claims need tests that reproduce the relevant interleavings and durability boundaries.
+
+Worked example
+The project tests exact decimal arithmetic, stale entity versions, transactional rollback, concurrent stock purchases, duplicate reservations, order idempotency, and inventory timeouts. OrderTest uses a real local HTTP fixture so RestClient’s network and timeout behavior is exercised. Separate smoke tests start both actual Boot services.
+
+Practice and model answer
+Break one invariant deliberately: remove the stock lock or change timeout handling from PENDING to REJECTED. Identify which existing test fails and add a missing test only if the behavior is not covered. Tests should fail for the behavior they are intended to protect. Avoid duplicating implementation line by line. H2 success is useful but does not establish PostgreSQL lock timing, query plans, or dialect compatibility; run the target database before making those claims.
+
+Interview check
+Question. What does an integration test add over a unit test? Answer. Evidence that multiple real components cooperate through their actual boundaries and configuration. Question. Why not test everything end to end? Answer. Such tests are slower and less diagnostic; use focused tests for most rules and a few complete-path checks.

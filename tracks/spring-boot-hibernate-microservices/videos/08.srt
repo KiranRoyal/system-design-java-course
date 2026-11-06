@@ -1,0 +1,139 @@
+1
+00:00:00,000 --> 00:00:06,056
+Controllers translate HTTP requests into application operations and translate results back into
+
+2
+00:00:06,056 --> 00:00:07,570
+the API contract.
+
+3
+00:00:07,720 --> 00:00:12,993
+Keep business rules in services, persistence in repositories, and request validation at
+
+4
+00:00:12,993 --> 00:00:13,872
+the boundary.
+
+5
+00:00:14,022 --> 00:00:19,052
+DTOs prevent persistence details from accidentally becoming public JSON fields.
+
+6
+00:00:19,202 --> 00:00:23,717
+They also avoid serializing lazy relationships or recursive entity graphs.
+
+7
+00:00:23,867 --> 00:00:26,027
+Pagination must be bounded and ordered.
+
+8
+00:00:26,177 --> 00:00:29,871
+A page without a stable sort can repeat or omit records as
+
+9
+00:00:29,871 --> 00:00:30,795
+the database changes.
+
+10
+00:00:30,945 --> 00:00:35,962
+Offset pagination is simple for small datasets; keyset pagination can work better
+
+11
+00:00:35,962 --> 00:00:37,635
+for deep sequential browsing.
+
+12
+00:00:37,785 --> 00:00:42,158
+Define maximum page size so one request cannot fetch the entire table.
+
+13
+00:00:42,308 --> 00:00:47,136
+InventoryController maps products to ProductView records and accepts page sizes from one
+
+14
+00:00:47,136 --> 00:00:48,343
+to one hundred.
+
+15
+00:00:48,493 --> 00:00:50,208
+It sorts by product ID.
+
+16
+00:00:50,358 --> 00:00:55,272
+OrderController exposes only ID, product, quantity, and status.
+
+17
+00:00:55,422 --> 00:01:00,370
+Internal idempotency keys and JPA version fields are not automatically serialized from
+
+18
+00:01:00,370 --> 00:01:01,608
+the order entity.
+
+19
+00:01:01,758 --> 00:01:05,238
+Add GET /products/{id} and a product search endpoint.
+
+20
+00:01:05,388 --> 00:01:11,089
+Return explicit DTOs, validate pagination limits, and test the empty page and
+
+21
+00:01:11,089 --> 00:01:13,464
+unknown product cases over HTTP.
+
+22
+00:01:13,614 --> 00:01:17,229
+Map an unknown product to the documented 404 response.
+
+23
+00:01:17,379 --> 00:01:21,000
+Keep search inputs parameterized through repository APIs.
+
+24
+00:01:21,150 --> 00:01:25,047
+Use a deterministic sort with a tie-breaker and state whether the endpoint
+
+25
+00:01:25,047 --> 00:01:27,970
+returns a total count or only a next-page indicator.
+
+26
+00:01:28,120 --> 00:01:28,791
+Question.
+
+27
+00:01:28,941 --> 00:01:32,252
+Why avoid returning JPA entities from controllers?
+
+28
+00:01:32,402 --> 00:01:32,979
+Answer.
+
+29
+00:01:33,129 --> 00:01:37,585
+It couples the public API to persistence structure and can expose internal
+
+30
+00:01:37,585 --> 00:01:39,813
+fields or trigger unexpected lazy loads.
+
+31
+00:01:39,963 --> 00:01:40,634
+Question.
+
+32
+00:01:40,784 --> 00:01:42,482
+What is keyset pagination?
+
+33
+00:01:42,632 --> 00:01:43,209
+Answer.
+
+34
+00:01:43,359 --> 00:01:47,547
+Fetching rows after a stable ordered cursor, such as a last-seen ID,
+
+35
+00:01:47,547 --> 00:01:49,642
+instead of skipping a growing offset.

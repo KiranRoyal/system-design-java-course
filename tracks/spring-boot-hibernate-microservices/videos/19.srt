@@ -1,0 +1,151 @@
+1
+00:00:00,000 --> 00:00:04,037
+Idempotency preserves one logical intent across repeated delivery.
+
+2
+00:00:04,187 --> 00:00:08,190
+A client-generated key must remain stable for the same intent, and the
+
+3
+00:00:08,190 --> 00:00:10,860
+server must bind it to relevant request fields.
+
+4
+00:00:11,010 --> 00:00:13,495
+The same key with changed data should conflict.
+
+5
+00:00:13,645 --> 00:00:17,586
+Persist the key and business result with a unique constraint so multiple
+
+6
+00:00:17,586 --> 00:00:19,228
+instances share the same authority.
+
+7
+00:00:19,378 --> 00:00:22,568
+A check-then-insert without a database constraint can race.
+
+8
+00:00:22,718 --> 00:00:27,060
+Handle the losing concurrent insert outside its failed transaction, then read and
+
+9
+00:00:27,060 --> 00:00:28,507
+compare the winning record.
+
+10
+00:00:28,657 --> 00:00:32,778
+Define retention: deleting old keys can allow an old retry to create
+
+11
+00:00:32,778 --> 00:00:33,808
+a new effect.
+
+12
+00:00:33,958 --> 00:00:36,805
+Scope keys by account in a multi-tenant system.
+
+13
+00:00:36,955 --> 00:00:39,768
+Orders stores request_key with a unique constraint.
+
+14
+00:00:39,918 --> 00:00:44,304
+A matching retry returns the same order; a changed quantity conflicts.
+
+15
+00:00:44,454 --> 00:00:49,287
+The downstream reservation uses the stable order ID, so retries after an
+
+16
+00:00:49,287 --> 00:00:52,106
+unknown inventory outcome cannot consume stock twice.
+
+17
+00:00:52,256 --> 00:00:57,481
+The local demo has no authenticated accounts; tenant-scoped keys are an explicit
+
+18
+00:00:57,481 --> 00:00:58,352
+production extension.
+
+19
+00:00:58,502 --> 00:01:03,371
+Launch twenty concurrent requests using one checkout key, then repeat with different
+
+20
+00:01:03,371 --> 00:01:03,777
+quantities.
+
+21
+00:01:03,927 --> 00:01:08,762
+Verify one order, one reservation, and a conflict for mismatched intent.
+
+22
+00:01:08,912 --> 00:01:10,847
+Design a key-retention policy.
+
+23
+00:01:10,997 --> 00:01:15,141
+Count durable business effects rather than HTTP responses alone.
+
+24
+00:01:15,291 --> 00:01:19,826
+A policy should cover the maximum expected retry window and any legal
+
+25
+00:01:19,826 --> 00:01:21,337
+or business retention requirements.
+
+26
+00:01:21,487 --> 00:01:26,299
+Hash a canonical request representation if the request grows beyond a few
+
+27
+00:01:26,299 --> 00:01:28,705
+fields, and version the canonicalization rule.
+
+28
+00:01:28,855 --> 00:01:29,526
+Question.
+
+29
+00:01:29,676 --> 00:01:32,623
+Is a random key generated on every retry useful?
+
+30
+00:01:32,773 --> 00:01:33,349
+Answer.
+
+31
+00:01:33,499 --> 00:01:33,983
+No.
+
+32
+00:01:34,133 --> 00:01:38,275
+It turns each retry into a new logical intent and defeats deduplication.
+
+33
+00:01:38,425 --> 00:01:39,096
+Question.
+
+34
+00:01:39,246 --> 00:01:42,996
+Can an in-memory map enforce idempotency across replicas?
+
+35
+00:01:43,146 --> 00:01:43,723
+Answer.
+
+36
+00:01:43,873 --> 00:01:44,971
+Not by itself.
+
+37
+00:01:45,121 --> 00:01:50,012
+Replicas need shared durable coordination or a routing and recovery design that
+
+38
+00:01:50,012 --> 00:01:51,235
+provides equivalent guarantees.

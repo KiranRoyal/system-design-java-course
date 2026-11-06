@@ -1,0 +1,19 @@
+Agentic AI with Java
+19 Observability deployment and operations
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+An agent trace should connect the user request, model calls, tool calls, validation decisions, and final outcome. Record model and prompt versions, durations, error categories, token usage, and source identifiers. Avoid logging raw secrets or unnecessary customer data. Debugging should answer which step failed and what authority it had, not merely display a large transcript.
+
+How to reason about it
+Deploy behind authentication, ingress limits, and controlled egress. Separate readiness from liveness and ensure shutdown drains or records in-flight work. Track business success, unsupported-answer rate, and cost alongside HTTP latency. Roll out model or prompt changes gradually and retain a rollback path with comparable evaluation results.
+
+Worked example
+A support request may return HTTP 200 while giving an unsupported delivery promise. Therefore transport success alone is insufficient. The lab’s trace contains synthetic data for inspection; a production trace needs access controls and redaction. The application should retain exact effect IDs while minimizing sensitive narrative content.
+
+Practice and model answer
+Design a dashboard and three alerts for the support assistant. Create a deployment checklist including model rollout, evaluation gates, rollback, retention, and emergency tool disablement. Alert on a sustained increase in failed tasks or unsupported claims, exhausted provider quota, and authorization violations. Choose thresholds from a baseline and business impact. Tool disablement should stop risky effects without requiring every prompt to be rewritten.
+
+Interview check
+Question. What makes an AI trace useful? Answer. It connects a specific outcome to versioned inputs, decisions, evidence, and dependency timings while protecting sensitive data. Question. Why can a prompt-only release need rollback? Answer. It can alter tool selection, answer quality, token usage, latency, and failure behavior even when Java code is unchanged.

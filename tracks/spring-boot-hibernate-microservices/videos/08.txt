@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+08 REST controllers DTOs and pagination
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Controllers translate HTTP requests into application operations and translate results back into the API contract. Keep business rules in services, persistence in repositories, and request validation at the boundary. DTOs prevent persistence details from accidentally becoming public JSON fields. They also avoid serializing lazy relationships or recursive entity graphs.
+
+How to reason about it
+Pagination must be bounded and ordered. A page without a stable sort can repeat or omit records as the database changes. Offset pagination is simple for small datasets; keyset pagination can work better for deep sequential browsing. Define maximum page size so one request cannot fetch the entire table.
+
+Worked example
+InventoryController maps products to ProductView records and accepts page sizes from one to one hundred. It sorts by product ID. OrderController exposes only ID, product, quantity, and status. Internal idempotency keys and JPA version fields are not automatically serialized from the order entity.
+
+Practice and model answer
+Add GET /products/{id} and a product search endpoint. Return explicit DTOs, validate pagination limits, and test the empty page and unknown product cases over HTTP. Map an unknown product to the documented 404 response. Keep search inputs parameterized through repository APIs. Use a deterministic sort with a tie-breaker and state whether the endpoint returns a total count or only a next-page indicator.
+
+Interview check
+Question. Why avoid returning JPA entities from controllers? Answer. It couples the public API to persistence structure and can expose internal fields or trigger unexpected lazy loads. Question. What is keyset pagination? Answer. Fetching rows after a stable ordered cursor, such as a last-seen ID, instead of skipping a growing offset.

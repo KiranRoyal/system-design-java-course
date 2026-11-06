@@ -1,0 +1,106 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:03.770
+A Java program organizes behavior into classes and methods.
+
+00:00:03.920 --> 00:00:08.701
+Variables have declared types, and the compiler checks many mistakes before the
+
+00:00:08.701 --> 00:00:09.498
+program runs.
+
+00:00:09.648 --> 00:00:13.842
+Primitive types represent values such as integers and booleans; reference types refer
+
+00:00:13.842 --> 00:00:15.939
+to objects and may be null.
+
+00:00:16.089 --> 00:00:19.719
+Choose types that express the domain instead of passing every value as
+
+00:00:19.719 --> 00:00:20.325
+a string.
+
+00:00:20.475 --> 00:00:25.462
+For commerce calculations, decide whether money is represented as integer minor units
+
+00:00:25.462 --> 00:00:28.371
+or BigDecimal with an explicit rounding policy.
+
+00:00:28.521 --> 00:00:32.752
+Binary floating-point cannot exactly represent many decimal fractions.
+
+00:00:32.902 --> 00:00:37.221
+Construct BigDecimal from decimal strings when exact decimal input matters.
+
+00:00:37.371 --> 00:00:41.465
+Validate quantities and prices at the domain boundary, not only in a
+
+00:00:41.465 --> 00:00:42.147
+web form.
+
+00:00:42.297 --> 00:00:47.179
+JavaBasics.Line contains a stock-keeping unit, quantity, and unit price.
+
+00:00:47.329 --> 00:00:52.504
+Its constructor rejects an empty SKU, nonpositive quantity, or negative price.
+
+00:00:52.654 --> 00:00:58.670
+Three items priced at 0.10 produce exactly 0.30 in the supplied test.
+
+00:00:58.820 --> 00:01:03.090
+A valid domain object makes later calculations easier to reason about.
+
+00:01:03.240 --> 00:01:06.801
+Implement subtotal, tax, and total for a basket.
+
+00:01:06.951 --> 00:01:11.416
+Choose a rounding rule and test zero items, a fractional tax, a
+
+00:01:11.416 --> 00:01:13.277
+large quantity, and invalid input.
+
+00:01:13.427 --> 00:01:15.203
+Compile with Java 21.
+
+00:01:15.353 --> 00:01:18.394
+Keep arithmetic separate from printing and HTTP.
+
+00:01:18.544 --> 00:01:22.547
+State when rounding occurs, such as once per invoice or once per
+
+00:01:22.547 --> 00:01:24.548
+line, because the totals can differ.
+
+00:01:24.698 --> 00:01:28.460
+Test expected decimal values rather than formatted strings alone.
+
+00:01:28.610 --> 00:01:29.282
+Question.
+
+00:01:29.432 --> 00:01:32.406
+Why not use double for exact currency arithmetic?
+
+00:01:32.556 --> 00:01:33.133
+Answer.
+
+00:01:33.283 --> 00:01:38.095
+Many decimal amounts cannot be represented exactly in binary floating-point; use minor
+
+00:01:38.095 --> 00:01:41.704
+units or decimal arithmetic with a stated rounding rule.
+
+00:01:41.854 --> 00:01:42.526
+Question.
+
+00:01:42.676 --> 00:01:45.802
+What is the difference between a compile error and an exception?
+
+00:01:45.952 --> 00:01:46.528
+Answer.
+
+00:01:46.678 --> 00:01:51.674
+A compile error prevents valid bytecode generation; an exception occurs while a
+
+00:01:51.674 --> 00:01:53.339
+compiled program is executing.

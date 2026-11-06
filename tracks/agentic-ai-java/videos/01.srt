@@ -1,0 +1,159 @@
+1
+00:00:00,000 --> 00:00:03,645
+An AI agent is an application in which a model can choose
+
+2
+00:00:03,645 --> 00:00:06,986
+a next action, inspect its result, and continue toward a goal.
+
+3
+00:00:07,136 --> 00:00:10,620
+The model proposes; Java code controls execution.
+
+4
+00:00:10,770 --> 00:00:13,902
+A chatbot can answer text without taking any action.
+
+5
+00:00:14,052 --> 00:00:17,358
+A workflow follows paths selected by application code.
+
+6
+00:00:17,508 --> 00:00:20,314
+An agent may select among those paths at runtime.
+
+7
+00:00:20,464 --> 00:00:23,876
+These are degrees of autonomy, not levels of intelligence.
+
+8
+00:00:24,026 --> 00:00:27,523
+Start with a narrow user goal and a measurable success condition.
+
+9
+00:00:27,673 --> 00:00:32,878
+For order support, success means identifying the correct customer’s order, reporting its
+
+10
+00:00:32,878 --> 00:00:36,348
+actual status, and explaining the permitted next step.
+
+11
+00:00:36,498 --> 00:00:40,349
+A fluent answer is insufficient if the order belongs to another customer.
+
+12
+00:00:40,499 --> 00:00:44,341
+Choose deterministic code whenever rules already determine the right action.
+
+13
+00:00:44,491 --> 00:00:48,458
+Add a model where language understanding or flexible selection is useful.
+
+14
+00:00:48,608 --> 00:00:53,249
+Our support assistant has two read-only tools: lookupOrder and searchPolicy.
+
+15
+00:00:53,399 --> 00:00:58,527
+A scripted model first requests order A100, then the policy, then produces
+
+16
+00:00:58,527 --> 00:01:00,664
+an answer with source identifiers.
+
+17
+00:01:00,814 --> 00:01:03,996
+The same engine can use a local language model through Ollama.
+
+18
+00:01:04,146 --> 00:01:09,142
+Scripted mode demonstrates orchestration and is repeatable; it does not perform AI
+
+19
+00:01:09,142 --> 00:01:09,559
+inference.
+
+20
+00:01:09,709 --> 00:01:13,405
+No tool pays money, modifies an order, or runs a shell.
+
+21
+00:01:13,555 --> 00:01:15,037
+Run Main in scripted mode.
+
+22
+00:01:15,187 --> 00:01:19,440
+Draw the request path and identify every place the application can reject
+
+23
+00:01:19,440 --> 00:01:20,149
+a decision.
+
+24
+00:01:20,299 --> 00:01:24,014
+Compare an agent with a simple if statement for checking order status.
+
+25
+00:01:24,164 --> 00:01:30,294
+The application validates input, action type, tool name, arguments, trusted identity, output
+
+26
+00:01:30,294 --> 00:01:33,869
+size, number of calls, and elapsed time.
+
+27
+00:01:34,019 --> 00:01:37,663
+For a known order ID and a single status lookup, direct code
+
+28
+00:01:37,663 --> 00:01:38,270
+is simpler.
+
+29
+00:01:38,420 --> 00:01:42,897
+An agent helps when the user describes a problem requiring several information
+
+30
+00:01:42,897 --> 00:01:43,270
+sources.
+
+31
+00:01:43,420 --> 00:01:44,091
+Question.
+
+32
+00:01:44,241 --> 00:01:45,730
+When would you avoid an agent?
+
+33
+00:01:45,880 --> 00:01:46,456
+Answer.
+
+34
+00:01:46,606 --> 00:01:51,246
+When a deterministic rule or fixed workflow satisfies the requirement more cheaply
+
+35
+00:01:51,246 --> 00:01:52,019
+and predictably.
+
+36
+00:01:52,169 --> 00:01:52,840
+Question.
+
+37
+00:01:52,990 --> 00:01:54,576
+Who executes a tool call?
+
+38
+00:01:54,726 --> 00:01:55,303
+Answer.
+
+39
+00:01:55,453 --> 00:01:56,543
+The application.
+
+40
+00:01:56,693 --> 00:02:00,912
+Model output is a request for execution, not an authorization grant.

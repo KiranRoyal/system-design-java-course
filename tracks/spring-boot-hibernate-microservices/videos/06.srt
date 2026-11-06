@@ -1,0 +1,131 @@
+1
+00:00:00,000 --> 00:00:03,439
+Spring creates and connects application objects called beans.
+
+2
+00:00:03,589 --> 00:00:08,709
+Constructor injection declares required dependencies and supports ordinary unit testing.
+
+3
+00:00:08,859 --> 00:00:13,296
+A service should express business behavior without looking up its dependencies from
+
+4
+00:00:13,296 --> 00:00:14,406
+a global context.
+
+5
+00:00:14,556 --> 00:00:20,101
+Bean scope controls instance lifetime; singleton means one instance per application context,
+
+6
+00:00:20,101 --> 00:00:22,873
+not one instance across all deployments.
+
+7
+00:00:23,023 --> 00:00:28,634
+Several Spring features use proxies that intercept calls, including declarative transactions.
+
+8
+00:00:28,784 --> 00:00:32,759
+With the usual proxy-based transaction model, a method calling another method on
+
+9
+00:00:32,759 --> 00:00:35,741
+the same object does not pass through the proxy.
+
+10
+00:00:35,891 --> 00:00:40,293
+This explains why moving a transactional method to a separate injected service
+
+11
+00:00:40,293 --> 00:00:41,393
+can change behavior.
+
+12
+00:00:41,543 --> 00:00:47,084
+OrderService orchestrates the checkout while OrderTransactions owns short database transactions.
+
+13
+00:00:47,234 --> 00:00:51,716
+Calls from OrderService to the injected OrderTransactions bean cross the proxy.
+
+14
+00:00:51,866 --> 00:00:56,960
+The HTTP inventory call happens after create returns and before complete begins,
+
+15
+00:00:56,960 --> 00:01:00,781
+avoiding a database transaction held open during network waiting.
+
+16
+00:01:00,931 --> 00:01:03,095
+Draw the bean graph for both services.
+
+17
+00:01:03,245 --> 00:01:06,863
+Write a unit test that constructs a pure domain service directly.
+
+18
+00:01:07,013 --> 00:01:12,464
+Demonstrate why calling this.transactionalMethod() differs from calling a separate proxied bean.
+
+19
+00:01:12,614 --> 00:01:18,001
+Constructor injection reveals the graph and prevents partially initialized required dependencies.
+
+20
+00:01:18,151 --> 00:01:22,722
+Verify transaction activity or rollback behavior in the proxy demonstration rather than
+
+21
+00:01:22,722 --> 00:01:25,389
+relying on the presence of an annotation.
+
+22
+00:01:25,539 --> 00:01:28,834
+Keep infrastructure details out of pure calculations.
+
+23
+00:01:28,985 --> 00:01:29,656
+Question.
+
+24
+00:01:29,806 --> 00:01:32,482
+Does a singleton bean make its fields thread-safe?
+
+25
+00:01:32,632 --> 00:01:33,209
+Answer.
+
+26
+00:01:33,359 --> 00:01:33,842
+No.
+
+27
+00:01:33,992 --> 00:01:38,639
+Concurrent requests may call the same instance, so mutable fields need appropriate
+
+28
+00:01:38,639 --> 00:01:40,575
+coordination or should be avoided.
+
+29
+00:01:40,725 --> 00:01:41,397
+Question.
+
+30
+00:01:41,547 --> 00:01:45,113
+Why can self-invocation bypass a transaction annotation?
+
+31
+00:01:45,263 --> 00:01:45,840
+Answer.
+
+32
+00:01:45,990 --> 00:01:49,771
+The call stays inside the target object and does not pass through
+
+33
+00:01:49,771 --> 00:01:50,716
+the transaction proxy.

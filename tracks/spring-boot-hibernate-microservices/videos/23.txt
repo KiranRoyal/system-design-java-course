@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+23 Observability containers and production delivery
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Logs explain discrete events, metrics summarize behavior over time, and traces connect work across service boundaries. Use correlation identifiers and structured fields while avoiding credentials and unnecessary customer data. Measure request rates, errors, latency distributions, pool waits, database contention, and business outcomes. Averages alone can hide slow-tail behavior.
+
+How to reason about it
+Containerization packages runtime dependencies but does not make an application operationally complete. Configure resource limits, health checks, graceful shutdown, secret injection, database backups, and deployment rollback. A successful build is different from a successful rollout. Readiness should reflect whether the instance can serve its intended traffic.
+
+Worked example
+The demo exposes health and info through Actuator and binds to loopback. PostgreSQL configuration and migrations prepare the next deployment step, but production authentication, broker delivery, telemetry export, and load-tested capacity remain explicit extensions. A pending-order count and age metric would reveal stuck reconciliation better than HTTP status counts alone.
+
+Practice and model answer
+Create a container image, run each service with a separate PostgreSQL database, and load-test a fixed workload. Record hardware, dataset size, concurrency, duration, throughput, error rate, and latency percentiles. Compare measurements under the same conditions and avoid claiming production capacity from a laptop test. Include dependency and database limits in the explanation. Verify restore procedures and schema compatibility as part of recovery, not only that a backup file exists.
+
+Interview check
+Question. Why is p95 useful? Answer. It describes the latency below which 95 percent of measured requests fall, revealing tail behavior hidden by the mean. Question. What should a deployment rollback consider besides code? Answer. Schema compatibility, configuration, external effects, queued events, and data written by the newer version.

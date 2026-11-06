@@ -1,0 +1,106 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.048
+Relationships map object references to foreign keys or join tables.
+
+00:00:04.198 --> 00:00:07.552
+The owning side determines which mapping writes the relationship.
+
+00:00:07.702 --> 00:00:12.391
+For a typical one-to-many and many-to-one pair, the many-to-one side owns the
+
+00:00:12.391 --> 00:00:15.518
+foreign key, while mappedBy identifies the inverse collection.
+
+00:00:15.668 --> 00:00:18.824
+Keep both object sides consistent through helper methods.
+
+00:00:18.974 --> 00:00:24.188
+Cascade controls which entity operations propagate; it is not database foreign-key cascading
+
+00:00:24.188 --> 00:00:28.099
+and does not mean every relationship should use CascadeType.ALL.
+
+00:00:28.249 --> 00:00:32.710
+Orphan removal deletes children removed from an owned collection and should match
+
+00:00:32.710 --> 00:00:33.454
+aggregate semantics.
+
+00:00:33.604 --> 00:00:36.910
+Avoid cascading removal from an order to a shared product.
+
+00:00:37.060 --> 00:00:41.429
+The supplied checkout starts with one product per order to keep distributed
+
+00:00:41.429 --> 00:00:42.157
+behavior visible.
+
+00:00:42.307 --> 00:00:47.228
+The relationship extension adds OrderLine children owned by PurchaseOrder, with each line
+
+00:00:47.228 --> 00:00:50.098
+storing a product identifier and price snapshot.
+
+00:00:50.248 --> 00:00:54.705
+Product remains owned by inventory and is not a JPA relationship across
+
+00:00:54.705 --> 00:00:55.076
+services.
+
+00:00:55.226 --> 00:00:58.254
+Implement OrderLine with quantity and price snapshot.
+
+00:00:58.404 --> 00:01:01.315
+Add a helper that sets both order.lines and line.order.
+
+00:01:01.465 --> 00:01:05.810
+Test adding a line, removing a line, and deleting an order without
+
+00:01:05.810 --> 00:01:07.259
+deleting any catalog product.
+
+00:01:07.409 --> 00:01:10.200
+Use aggregate ownership for cascade decisions.
+
+00:01:10.350 --> 00:01:13.809
+A line belongs to one order and may be deleted with it;
+
+00:01:13.809 --> 00:01:15.827
+a product is shared and independently managed.
+
+00:01:15.977 --> 00:01:18.621
+Add migrations and test foreign-key behavior.
+
+00:01:18.771 --> 00:01:22.083
+Do not expose the bidirectional graph directly as JSON.
+
+00:01:22.233 --> 00:01:22.905
+Question.
+
+00:01:23.055 --> 00:01:24.439
+What does mappedBy mean?
+
+00:01:24.589 --> 00:01:25.165
+Answer.
+
+00:01:25.315 --> 00:01:29.112
+It names the property on the owning side of a bidirectional relationship;
+
+00:01:29.112 --> 00:01:31.327
+it is not the database column name.
+
+00:01:31.477 --> 00:01:32.148
+Question.
+
+00:01:32.298 --> 00:01:34.924
+Why store a price snapshot on an order line?
+
+00:01:35.074 --> 00:01:35.651
+Answer.
+
+00:01:35.801 --> 00:01:39.738
+The order must preserve the agreed purchase price even when the catalog
+
+00:01:39.738 --> 00:01:40.722
+price later changes.

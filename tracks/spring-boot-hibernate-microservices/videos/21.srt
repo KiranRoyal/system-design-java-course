@@ -1,0 +1,131 @@
+1
+00:00:00,000 --> 00:00:04,293
+A saga coordinates a business process through multiple local transactions.
+
+2
+00:00:04,443 --> 00:00:10,966
+Each step commits independently, and failures trigger retries, compensation, or manual resolution.
+
+3
+00:00:11,116 --> 00:00:16,073
+Compensation is a business operation, not a database rollback across services.
+
+4
+00:00:16,223 --> 00:00:19,761
+It can also fail and may not fully reverse an external effect.
+
+5
+00:00:19,911 --> 00:00:27,477
+Define explicit states, allowed transitions, stable step identifiers, deadlines, and recovery ownership.
+
+6
+00:00:27,627 --> 00:00:30,911
+Persist progress so a worker can resume after a crash.
+
+7
+00:00:31,061 --> 00:00:33,761
+Distinguish known rejection from unknown outcome.
+
+8
+00:00:33,911 --> 00:00:39,064
+A payment timeout, for example, requires querying the provider before deciding whether
+
+9
+00:00:39,064 --> 00:00:40,781
+to retry or compensate.
+
+10
+00:00:40,931 --> 00:00:46,002
+The learning checkout contains a small two-service workflow: create PENDING order, reserve
+
+11
+00:00:46,002 --> 00:00:48,537
+inventory, then mark a terminal status.
+
+12
+00:00:48,687 --> 00:00:55,650
+It has no payment step, automatic reconciliation scheduler, cancellation, or stock-release compensation.
+
+13
+00:00:55,800 --> 00:01:00,208
+The advanced capstone adds these capabilities without pretending that the initial demo
+
+14
+00:01:00,208 --> 00:01:02,045
+is a complete commerce saga.
+
+15
+00:01:02,195 --> 00:01:07,068
+Extend the state machine with payment authorization and stock release using synthetic
+
+16
+00:01:07,068 --> 00:01:07,474
+providers.
+
+17
+00:01:07,624 --> 00:01:12,001
+Create a failure matrix covering timeouts before and after each remote effect
+
+18
+00:01:12,001 --> 00:01:14,554
+and crashes before each local state update.
+
+19
+00:01:14,704 --> 00:01:19,120
+For each row, specify how to discover the actual outcome and which
+
+20
+00:01:19,120 --> 00:01:20,592
+idempotency key to reuse.
+
+21
+00:01:20,742 --> 00:01:24,282
+Persist compensation attempts and alert on exhausted recovery.
+
+22
+00:01:24,432 --> 00:01:29,076
+A manual-review state is valid when automatic resolution cannot safely determine the
+
+23
+00:01:29,076 --> 00:01:29,850
+next action.
+
+24
+00:01:30,000 --> 00:01:30,672
+Question.
+
+25
+00:01:30,822 --> 00:01:33,286
+Why is compensation different from rollback?
+
+26
+00:01:33,436 --> 00:01:34,012
+Answer.
+
+27
+00:01:34,162 --> 00:01:39,510
+Earlier service transactions have already committed, and reversing their business effects requires
+
+28
+00:01:39,510 --> 00:01:40,402
+new operations.
+
+29
+00:01:40,552 --> 00:01:41,223
+Question.
+
+30
+00:01:41,373 --> 00:01:43,779
+What must survive a coordinator restart?
+
+31
+00:01:43,929 --> 00:01:44,506
+Answer.
+
+32
+00:01:44,656 --> 00:01:51,075
+Workflow state, step identities, known outcomes, retry metadata, and enough information to
+
+33
+00:01:51,075 --> 00:01:52,680
+reconcile unknown effects.

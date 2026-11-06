@@ -1,0 +1,135 @@
+1
+00:00:00,000 --> 00:00:02,098
+A class combines state and behavior.
+
+2
+00:00:02,248 --> 00:00:05,926
+Encapsulation protects rules by limiting how state can change.
+
+3
+00:00:06,076 --> 00:00:11,704
+An interface describes a capability, allowing implementations to vary without changing callers.
+
+4
+00:00:11,854 --> 00:00:17,126
+Prefer composition when one object uses another capability; inheritance is useful only
+
+5
+00:00:17,126 --> 00:00:20,641
+when the subtype genuinely satisfies the parent contract.
+
+6
+00:00:20,791 --> 00:00:27,289
+Records provide concise data carriers and generated equality, accessors, and string representation.
+
+7
+00:00:27,439 --> 00:00:32,478
+They are useful for request and response DTOs, but JPA entities have
+
+8
+00:00:32,478 --> 00:00:34,578
+different lifecycle and proxy requirements.
+
+9
+00:00:34,728 --> 00:00:38,103
+Exceptions should represent meaningful failure categories.
+
+10
+00:00:38,253 --> 00:00:42,585
+Catch an exception only where you can recover, translate it into a
+
+11
+00:00:42,585 --> 00:00:46,195
+useful boundary contract, or add context without losing the cause.
+
+12
+00:00:46,345 --> 00:00:51,793
+JavaBasics.Discount is an interface whose implementation can calculate a discount without knowing
+
+13
+00:00:51,793 --> 00:00:52,701
+about Spring.
+
+14
+00:00:52,851 --> 00:00:56,854
+InventoryService has domain-specific Missing and Conflict failures.
+
+15
+00:00:57,004 --> 00:01:02,297
+The HTTP layer translates these into 404 and 409, preserving the distinction
+
+16
+00:01:02,297 --> 00:01:05,384
+between an absent product and insufficient stock.
+
+17
+00:01:05,534 --> 00:01:08,562
+Implement fixed and percentage discount strategies.
+
+18
+00:01:08,712 --> 00:01:12,304
+Add a maximum discount rule and tests that a discount cannot make
+
+19
+00:01:12,304 --> 00:01:13,202
+the total negative.
+
+20
+00:01:13,352 --> 00:01:17,213
+Explain why a request DTO should not be the same object as
+
+21
+00:01:17,213 --> 00:01:18,179
+a persistence entity.
+
+22
+00:01:18,329 --> 00:01:21,716
+Inject the selected strategy into a calculation service.
+
+23
+00:01:21,866 --> 00:01:27,783
+DTOs expose only the intended public contract; entities represent database state and
+
+24
+00:01:27,783 --> 00:01:31,727
+may include internal fields, relationships, and mutable lifecycle.
+
+25
+00:01:31,877 --> 00:01:36,322
+Keeping them separate prevents accidental API changes when mappings change.
+
+26
+00:01:36,472 --> 00:01:37,143
+Question.
+
+27
+00:01:37,293 --> 00:01:39,002
+What is dependency inversion?
+
+28
+00:01:39,152 --> 00:01:39,729
+Answer.
+
+29
+00:01:39,879 --> 00:01:44,914
+High-level policy depends on an abstraction rather than a concrete infrastructure detail.
+
+30
+00:01:45,064 --> 00:01:45,735
+Question.
+
+31
+00:01:45,885 --> 00:01:47,339
+When should you use a record?
+
+32
+00:01:47,489 --> 00:01:48,065
+Answer.
+
+33
+00:01:48,215 --> 00:01:53,028
+For a value-like data carrier whose shallow immutability and generated equality fit
+
+34
+00:01:53,028 --> 00:01:54,231
+the intended semantics.

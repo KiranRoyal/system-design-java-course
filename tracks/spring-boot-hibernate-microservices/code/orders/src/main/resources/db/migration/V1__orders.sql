@@ -1,0 +1,2 @@
+create table purchase_orders (id varchar(36) primary key, request_key varchar(80) not null unique, product_id bigint not null, quantity integer not null check (quantity > 0), status varchar(20) not null, version bigint not null);
+create table outbox_events (id varchar(36) primary key, order_id varchar(36) not null references purchase_orders(id), event_type varchar(40) not null, payload varchar(1000) not null, created_at timestamp with time zone not null);

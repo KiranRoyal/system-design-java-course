@@ -1,0 +1,19 @@
+Agentic AI with Java
+05 Structured output and validation
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Structured output turns generated text into a data contract. The lab expects a tool decision containing a name and string arguments, or a final decision containing an answer. JSON syntax alone is insufficient: a syntactically valid object may contain an unknown tool, a negative amount, a huge string, or an unauthorized account identifier.
+
+How to reason about it
+Validate in layers. Parse the response, check its shape, verify allowed action types, constrain field lengths and ranges, and finally apply business authorization. Reject unknown or mismatched fields when they can change meaning. A retry for malformed output needs its own budget; an unlimited repair loop merely moves the runaway behavior elsewhere.
+
+Worked example
+OllamaModel requests JSON mode and parses the message content. Agent then rejects an unregistered shell tool. SupportTools additionally requires the argument set to contain exactly orderId for a lookup. Consequently JSON mode is a formatting aid while the Java validators define what the application can actually do.
+
+Practice and model answer
+Add test inputs for a numeric orderId, a missing type, an unknown tool, an excessively large answer, and an extra tenant argument. Decide which validation layer should reject each. The adapter rejects non-string argument values. The engine rejects missing or unknown action types and oversized final answers. The tool rejects the extra tenant field. Add a schema for exact top-level fields if you need strict compatibility and version it before changing the contract.
+
+Interview check
+Question. Why validate after schema-constrained generation? Answer. Provider capabilities differ and schemas cannot encode every authorization or business rule. Question. Should malformed model JSON produce a successful user response? Answer. No. Return a controlled failure or a bounded retry, and record a parse or validation metric.

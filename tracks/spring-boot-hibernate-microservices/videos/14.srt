@@ -1,0 +1,143 @@
+1
+00:00:00,000 --> 00:00:04,500
+Lazy fetching defers data access until needed, while eager fetching requests related
+
+2
+00:00:04,500 --> 00:00:06,750
+data as part of loading policy.
+
+3
+00:00:06,900 --> 00:00:10,449
+Eager does not guarantee one SQL join or good performance.
+
+4
+00:00:10,599 --> 00:00:14,535
+The N plus one pattern occurs when one query loads parents and
+
+5
+00:00:14,535 --> 00:00:17,158
+subsequent accesses issue one additional query per parent.
+
+6
+00:00:17,308 --> 00:00:21,109
+Measure query count and row volume rather than guessing from annotations.
+
+7
+00:00:21,259 --> 00:00:25,941
+Choose a fetch plan for each use case: a DTO projection, entity
+
+8
+00:00:25,941 --> 00:00:28,282
+graph, fetch join, or batch fetching.
+
+9
+00:00:28,432 --> 00:00:31,711
+Joining several collections can multiply rows dramatically.
+
+10
+00:00:31,861 --> 00:00:36,281
+Combining collection fetch joins with pagination can be unsafe or inefficient depending
+
+11
+00:00:36,281 --> 00:00:38,491
+on the query and provider behavior.
+
+12
+00:00:38,641 --> 00:00:42,819
+Keep the persistence boundary explicit with Open Session in View disabled.
+
+13
+00:00:42,969 --> 00:00:47,409
+The product list maps simple product fields to DTOs, so it has
+
+14
+00:00:47,409 --> 00:00:48,519
+no relationship traversal.
+
+15
+00:00:48,669 --> 00:00:52,847
+After adding order lines, a dashboard that loads orders and then accesses
+
+16
+00:00:52,847 --> 00:00:55,284
+each line collection can trigger many queries.
+
+17
+00:00:55,434 --> 00:00:59,407
+A two-step paged query or projection can fetch only the data required
+
+18
+00:00:59,407 --> 00:01:00,400
+by the dashboard.
+
+19
+00:01:00,550 --> 00:01:03,079
+Create fifty orders with several lines each.
+
+20
+00:01:03,229 --> 00:01:07,833
+Record SQL count for a lazy traversal, a DTO projection, and a
+
+21
+00:01:07,833 --> 00:01:08,984
+bounded batch approach.
+
+22
+00:01:09,134 --> 00:01:12,547
+Compare transferred rows and latency as well as query count.
+
+23
+00:01:12,697 --> 00:01:16,787
+One enormous join is not automatically better than several bounded queries.
+
+24
+00:01:16,937 --> 00:01:21,777
+Prevent accidental lazy access after the transaction ends by assembling the DTO
+
+25
+00:01:21,777 --> 00:01:23,390
+inside the intended boundary.
+
+26
+00:01:23,540 --> 00:01:27,829
+Verify the chosen plan on the target database and realistic data size.
+
+27
+00:01:27,979 --> 00:01:28,650
+Question.
+
+28
+00:01:28,800 --> 00:01:30,594
+Does EAGER solve N plus one?
+
+29
+00:01:30,744 --> 00:01:31,321
+Answer.
+
+30
+00:01:31,471 --> 00:01:32,465
+Not reliably.
+
+31
+00:01:32,615 --> 00:01:37,140
+It specifies when data must be available, not an optimal SQL strategy.
+
+32
+00:01:37,290 --> 00:01:37,961
+Question.
+
+33
+00:01:38,111 --> 00:01:40,180
+Why disable Open Session in View?
+
+34
+00:01:40,330 --> 00:01:40,907
+Answer.
+
+35
+00:01:41,057 --> 00:01:46,605
+It makes database access boundaries explicit and reduces unexpected queries during response
+
+36
+00:01:46,605 --> 00:01:47,068
+rendering.

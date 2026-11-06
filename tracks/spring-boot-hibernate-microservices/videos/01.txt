@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+01 Java syntax values and methods
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+A Java program organizes behavior into classes and methods. Variables have declared types, and the compiler checks many mistakes before the program runs. Primitive types represent values such as integers and booleans; reference types refer to objects and may be null. Choose types that express the domain instead of passing every value as a string.
+
+How to reason about it
+For commerce calculations, decide whether money is represented as integer minor units or BigDecimal with an explicit rounding policy. Binary floating-point cannot exactly represent many decimal fractions. Construct BigDecimal from decimal strings when exact decimal input matters. Validate quantities and prices at the domain boundary, not only in a web form.
+
+Worked example
+JavaBasics.Line contains a stock-keeping unit, quantity, and unit price. Its constructor rejects an empty SKU, nonpositive quantity, or negative price. Three items priced at 0.10 produce exactly 0.30 in the supplied test. A valid domain object makes later calculations easier to reason about.
+
+Practice and model answer
+Implement subtotal, tax, and total for a basket. Choose a rounding rule and test zero items, a fractional tax, a large quantity, and invalid input. Compile with Java 21. Keep arithmetic separate from printing and HTTP. State when rounding occurs, such as once per invoice or once per line, because the totals can differ. Test expected decimal values rather than formatted strings alone.
+
+Interview check
+Question. Why not use double for exact currency arithmetic? Answer. Many decimal amounts cannot be represented exactly in binary floating-point; use minor units or decimal arithmetic with a stated rounding rule. Question. What is the difference between a compile error and an exception? Answer. A compile error prevents valid bytecode generation; an exception occurs while a compiled program is executing.

@@ -22,3 +22,9 @@
 # Temporary Microsoft Word and LibreOffice lock files
 .~*
 ~$*
+
+**/target/
+**/.local-data/
+
+**/__pycache__/
+*.pyc

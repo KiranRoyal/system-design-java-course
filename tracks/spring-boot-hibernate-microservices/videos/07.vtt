@@ -1,0 +1,100 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.574
+Spring Boot assembles a Spring application using starters, auto-configuration, and external configuration.
+
+00:00:06.724 --> 00:00:11.867
+Auto-configuration reacts to classes, properties, and existing beans; it is not magic
+
+00:00:11.867 --> 00:00:15.296
+and can be inspected when behavior is unexpected.
+
+00:00:15.446 --> 00:00:20.142
+Use the dependency management supplied by the chosen Boot release instead of
+
+00:00:20.142 --> 00:00:21.708
+independently mixing framework versions.
+
+00:00:21.858 --> 00:00:25.154
+Keep environment-specific values outside source code.
+
+00:00:25.304 --> 00:00:31.668
+Profiles can select local and PostgreSQL settings, while environment variables supply connection
+
+00:00:31.668 --> 00:00:32.198
+details.
+
+00:00:32.348 --> 00:00:35.093
+Validate required configuration at startup.
+
+00:00:35.243 --> 00:00:40.130
+Secrets should come from an appropriate secret store or injected environment, never
+
+00:00:40.130 --> 00:00:41.759
+a committed repository file.
+
+00:00:41.909 --> 00:00:45.873
+Both services pin Boot 4.0.9 and Java 21.
+
+00:00:46.023 --> 00:00:51.061
+The default profile binds only to 127.0.0.1 and uses an in-memory H2
+
+00:00:51.061 --> 00:00:51.480
+database.
+
+00:00:51.630 --> 00:00:56.705
+The postgres profile reads DB_URL, DB_USER, and DB_PASSWORD.
+
+00:00:56.855 --> 00:01:01.350
+Flyway creates the schema, while Hibernate validates that the mappings match it.
+
+00:01:01.500 --> 00:01:04.270
+Restarting the default profile resets its data.
+
+00:01:04.420 --> 00:01:07.725
+Run a service with a different port supplied on the command line.
+
+00:01:07.875 --> 00:01:12.541
+Then intentionally provide an invalid database URL and inspect the startup failure.
+
+00:01:12.691 --> 00:01:16.345
+Explain which settings should vary between development and production.
+
+00:01:16.495 --> 00:01:23.669
+Ports, database endpoints, credentials, timeouts, and observability destinations vary by environment.
+
+00:01:23.819 --> 00:01:27.434
+Business invariants should not silently change through profiles.
+
+00:01:27.584 --> 00:01:32.849
+Keep a documented configuration contract and avoid copying production credentials into a
+
+00:01:32.849 --> 00:01:34.165
+local properties file.
+
+00:01:34.315 --> 00:01:34.987
+Question.
+
+00:01:35.137 --> 00:01:36.672
+What does a starter provide?
+
+00:01:36.822 --> 00:01:37.398
+Answer.
+
+00:01:37.548 --> 00:01:42.536
+A coordinated dependency set and configuration integration for a capability such as
+
+00:01:42.536 --> 00:01:44.198
+web MVC or JPA.
+
+00:01:44.348 --> 00:01:45.019
+Question.
+
+00:01:45.169 --> 00:01:47.412
+Why pin a compatible version family?
+
+00:01:47.562 --> 00:01:48.139
+Answer.
+
+00:01:48.289 --> 00:01:54.637
+It reduces untested combinations of Spring, Hibernate, Jackson, and other managed dependencies.

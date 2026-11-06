@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+06 Spring beans dependency injection and proxies
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Spring creates and connects application objects called beans. Constructor injection declares required dependencies and supports ordinary unit testing. A service should express business behavior without looking up its dependencies from a global context. Bean scope controls instance lifetime; singleton means one instance per application context, not one instance across all deployments.
+
+How to reason about it
+Several Spring features use proxies that intercept calls, including declarative transactions. With the usual proxy-based transaction model, a method calling another method on the same object does not pass through the proxy. This explains why moving a transactional method to a separate injected service can change behavior.
+
+Worked example
+OrderService orchestrates the checkout while OrderTransactions owns short database transactions. Calls from OrderService to the injected OrderTransactions bean cross the proxy. The HTTP inventory call happens after create returns and before complete begins, avoiding a database transaction held open during network waiting.
+
+Practice and model answer
+Draw the bean graph for both services. Write a unit test that constructs a pure domain service directly. Demonstrate why calling this.transactionalMethod() differs from calling a separate proxied bean. Constructor injection reveals the graph and prevents partially initialized required dependencies. Verify transaction activity or rollback behavior in the proxy demonstration rather than relying on the presence of an annotation. Keep infrastructure details out of pure calculations.
+
+Interview check
+Question. Does a singleton bean make its fields thread-safe? Answer. No. Concurrent requests may call the same instance, so mutable fields need appropriate coordination or should be avoided. Question. Why can self-invocation bypass a transaction annotation? Answer. The call stays inside the target object and does not pass through the transaction proxy.

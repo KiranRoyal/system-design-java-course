@@ -1,0 +1,106 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:02.141
+Validation occurs at several layers.
+
+00:00:02.291 --> 00:00:07.957
+Bean Validation checks request shape and ranges, domain methods enforce business invariants,
+
+00:00:07.957 --> 00:00:11.734
+and database constraints protect persisted state under concurrency.
+
+00:00:11.884 --> 00:00:13.993
+None completely replaces the others.
+
+00:00:14.143 --> 00:00:18.545
+A request may pass field validation but still conflict with current stock
+
+00:00:18.545 --> 00:00:20.746
+or a previously used idempotency key.
+
+00:00:20.896 --> 00:00:26.569
+Return stable error categories without leaking SQL, stack traces, or credentials.
+
+00:00:26.719 --> 00:00:31.118
+Problem Details gives an interoperable structure for HTTP errors.
+
+00:00:31.268 --> 00:00:36.307
+Include useful client information such as which field is invalid and a
+
+00:00:36.307 --> 00:00:40.507
+correlation identifier, while detailed internal diagnostics stay in protected logs.
+
+00:00:40.657 --> 00:00:45.141
+ReserveRequest requires a positive product ID and a quantity between one and
+
+00:00:45.141 --> 00:00:45.889
+one thousand.
+
+00:00:46.039 --> 00:00:51.127
+InventoryService rechecks its own boundary because it can also be called outside
+
+00:00:51.127 --> 00:00:51.551
+HTTP.
+
+00:00:51.701 --> 00:00:54.658
+A database check constraint prevents negative stock.
+
+00:00:54.808 --> 00:01:01.298
+Conflicts become 409; missing products become 404; invalid arguments become 400.
+
+00:01:01.448 --> 00:01:06.231
+Send malformed JSON, quantity zero, an unknown product, and a repeated key
+
+00:01:06.231 --> 00:01:07.826
+with a different quantity.
+
+00:01:07.976 --> 00:01:12.373
+Write down the expected status and verify it with the provided HTTP
+
+00:01:12.373 --> 00:01:14.206
+smoke test or Postman collection.
+
+00:01:14.356 --> 00:01:19.932
+Malformed or invalid input should return 400, unknown product 404, and a
+
+00:01:19.932 --> 00:01:21.327
+conflicting key 409.
+
+00:01:21.477 --> 00:01:25.273
+Confirm that failed requests do not alter stock or create orders.
+
+00:01:25.423 --> 00:01:29.919
+Avoid a catch-all handler that converts every programming defect into a misleading
+
+00:01:29.919 --> 00:01:30.668
+client error.
+
+00:01:30.818 --> 00:01:31.489
+Question.
+
+00:01:31.639 --> 00:01:33.488
+Why validate again in a service?
+
+00:01:33.638 --> 00:01:34.214
+Answer.
+
+00:01:34.364 --> 00:01:39.596
+Services may be invoked by jobs, tests, or other code that bypasses
+
+00:01:39.596 --> 00:01:40.904
+the HTTP validator.
+
+00:01:41.054 --> 00:01:41.725
+Question.
+
+00:01:41.875 --> 00:01:43.828
+Why keep database constraints?
+
+00:01:43.978 --> 00:01:44.554
+Answer.
+
+00:01:44.704 --> 00:01:49.626
+They enforce invariants at the durable shared boundary even when concurrent callers
+
+00:01:49.626 --> 00:01:52.087
+or another application bypass application checks.

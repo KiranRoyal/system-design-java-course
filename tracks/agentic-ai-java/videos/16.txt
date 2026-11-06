@@ -1,0 +1,19 @@
+Agentic AI with Java
+16 Evaluation datasets and regression testing
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Evaluate an AI application at several layers. Unit tests check deterministic code such as authorization and loop limits. Adapter tests check request and response contracts over HTTP. Retrieval tests measure whether relevant authorized evidence is found. End-to-end evaluations measure task success, unsupported claims, appropriate abstention, latency, and cost.
+
+How to reason about it
+Keep a versioned dataset containing normal requests, edge cases, adversarial inputs, and expected properties. Do not tune on the entire evaluation set; reserve holdout cases. A model grader can be useful but may share the same biases or mistakes as the model under test. Calibrate it against human judgments and report disagreement.
+
+Worked example
+The supplied JUnit suite proves that unknown tools are rejected and another tenant’s order is hidden. It does not prove that an arbitrary local model gives good answers. Run the same support questions through scripted mode and live mode, record the model version and prompt hash, and compare evidence support rather than wording alone.
+
+Practice and model answer
+Build a CSV with 30 cases and columns for tool accuracy, groundedness, access violations, calls, elapsed milliseconds, and tokens. Define a release threshold before running the experiment. Treat any access violation as a release blocker rather than averaging it away. Report task success with numerator and denominator, and keep cost and latency distributions. A threshold such as 90 percent success is a project choice, not a universal industry standard.
+
+Interview check
+Question. Why is exact string matching often inadequate? Answer. Several phrasings can express the same supported answer; compare required facts and prohibited behavior. Question. What does a mocked model test establish? Answer. It establishes orchestration behavior for supplied decisions, not the quality of real model decisions.

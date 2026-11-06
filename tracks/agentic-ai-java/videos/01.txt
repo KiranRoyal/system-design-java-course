@@ -1,0 +1,19 @@
+Agentic AI with Java
+01 What makes an application agentic
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+An AI agent is an application in which a model can choose a next action, inspect its result, and continue toward a goal. The model proposes; Java code controls execution. A chatbot can answer text without taking any action. A workflow follows paths selected by application code. An agent may select among those paths at runtime. These are degrees of autonomy, not levels of intelligence.
+
+How to reason about it
+Start with a narrow user goal and a measurable success condition. For order support, success means identifying the correct customer’s order, reporting its actual status, and explaining the permitted next step. A fluent answer is insufficient if the order belongs to another customer. Choose deterministic code whenever rules already determine the right action. Add a model where language understanding or flexible selection is useful.
+
+Worked example
+Our support assistant has two read-only tools: lookupOrder and searchPolicy. A scripted model first requests order A100, then the policy, then produces an answer with source identifiers. The same engine can use a local language model through Ollama. Scripted mode demonstrates orchestration and is repeatable; it does not perform AI inference. No tool pays money, modifies an order, or runs a shell.
+
+Practice and model answer
+Run Main in scripted mode. Draw the request path and identify every place the application can reject a decision. Compare an agent with a simple if statement for checking order status. The application validates input, action type, tool name, arguments, trusted identity, output size, number of calls, and elapsed time. For a known order ID and a single status lookup, direct code is simpler. An agent helps when the user describes a problem requiring several information sources.
+
+Interview check
+Question. When would you avoid an agent? Answer. When a deterministic rule or fixed workflow satisfies the requirement more cheaply and predictably. Question. Who executes a tool call? Answer. The application. Model output is a request for execution, not an authorization grant.

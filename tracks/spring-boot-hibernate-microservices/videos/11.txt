@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+11 SQL schema design indexes and transactions
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+A relational schema expresses entities, keys, relationships, and constraints. A transaction groups changes that must commit or roll back together. Isolation controls what concurrent transactions can observe; it does not automatically enforce every business rule. A read-then-write sequence can race unless protected by an appropriate lock, version check, conditional update, or constraint.
+
+How to reason about it
+Indexes speed selected reads and constraint checks but cost storage and write work. Design them for actual query predicates and ordering, then inspect execution plans on representative data. Avoid assuming that adding an index to every column improves performance. Keep transactions short to reduce lock duration and connection occupancy.
+
+Worked example
+The inventory schema has products and reservations. Stock cannot be negative, reservation quantity must be positive, and request_key is unique. The order schema records orders and outbox events in a separate database. An order ID in the inventory request is a business reference, not a cross-database foreign key.
+
+Practice and model answer
+Design an index for finding a user’s newest orders and explain the ordering of columns. Write a transaction that updates stock and inserts a reservation, then force the insert to fail and verify rollback. A candidate index begins with the equality-filtered user or tenant columns and continues with the time and stable tie-breaker used for ordering. Verify the plan with realistic cardinality. The failed reservation insert must leave stock unchanged because both changes share one transaction.
+
+Interview check
+Question. Does a transaction automatically prevent overselling? Answer. No. The isolation level and read-write pattern must enforce the stock invariant under concurrency. Question. Why can an unused index be harmful? Answer. It consumes space and increases insert, update, delete, and maintenance work without helping the workload.

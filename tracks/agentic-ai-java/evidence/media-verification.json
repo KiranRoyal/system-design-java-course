@@ -1,0 +1,182 @@
+[
+  {
+    "track": "agentic-ai-java",
+    "file": "01.mp4",
+    "decoded_seconds": 120.98,
+    "rms_dbfs": -17.62,
+    "peak_dbfs": -2.68,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "02.mp4",
+    "decoded_seconds": 116.9,
+    "rms_dbfs": -17.56,
+    "peak_dbfs": -2.23,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "03.mp4",
+    "decoded_seconds": 118.93,
+    "rms_dbfs": -17.63,
+    "peak_dbfs": -3.03,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "04.mp4",
+    "decoded_seconds": 117.62,
+    "rms_dbfs": -17.47,
+    "peak_dbfs": -3.09,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "05.mp4",
+    "decoded_seconds": 109.78,
+    "rms_dbfs": -17.47,
+    "peak_dbfs": -2.37,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "06.mp4",
+    "decoded_seconds": 113.46,
+    "rms_dbfs": -17.5,
+    "peak_dbfs": -2.61,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "07.mp4",
+    "decoded_seconds": 109.43,
+    "rms_dbfs": -17.5,
+    "peak_dbfs": -2.86,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "08.mp4",
+    "decoded_seconds": 124.08,
+    "rms_dbfs": -17.66,
+    "peak_dbfs": -2.93,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "09.mp4",
+    "decoded_seconds": 115.46,
+    "rms_dbfs": -17.64,
+    "peak_dbfs": -2.66,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "10.mp4",
+    "decoded_seconds": 108.06,
+    "rms_dbfs": -17.48,
+    "peak_dbfs": -2.49,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "11.mp4",
+    "decoded_seconds": 116.18,
+    "rms_dbfs": -17.59,
+    "peak_dbfs": -3.04,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "12.mp4",
+    "decoded_seconds": 110.97,
+    "rms_dbfs": -17.62,
+    "peak_dbfs": -2.93,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "13.mp4",
+    "decoded_seconds": 111.47,
+    "rms_dbfs": -17.6,
+    "peak_dbfs": -2.88,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "14.mp4",
+    "decoded_seconds": 112.65,
+    "rms_dbfs": -17.54,
+    "peak_dbfs": -2.41,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "15.mp4",
+    "decoded_seconds": 112.6,
+    "rms_dbfs": -17.47,
+    "peak_dbfs": -3.04,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "16.mp4",
+    "decoded_seconds": 111.16,
+    "rms_dbfs": -17.69,
+    "peak_dbfs": -2.95,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "17.mp4",
+    "decoded_seconds": 108.84,
+    "rms_dbfs": -17.65,
+    "peak_dbfs": -2.66,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "18.mp4",
+    "decoded_seconds": 112.48,
+    "rms_dbfs": -17.63,
+    "peak_dbfs": -3.1,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "19.mp4",
+    "decoded_seconds": 118.14,
+    "rms_dbfs": -17.53,
+    "peak_dbfs": -3.0,
+    "clipped_samples": 0,
+    "decode": "passed"
+  },
+  {
+    "track": "agentic-ai-java",
+    "file": "20.mp4",
+    "decoded_seconds": 128.07,
+    "rms_dbfs": -17.69,
+    "peak_dbfs": -2.36,
+    "clipped_samples": 0,
+    "decode": "passed"
+  }
+]

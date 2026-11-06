@@ -1,0 +1,139 @@
+1
+00:00:00,000 --> 00:00:01,990
+Build the capstone in milestones.
+
+2
+00:00:02,140 --> 00:00:05,648
+First run the two local services and explain their contracts.
+
+3
+00:00:05,798 --> 00:00:11,216
+Then add order lines and query-performance tests, run PostgreSQL migrations, add authentication
+
+4
+00:00:11,216 --> 00:00:16,635
+and ownership checks, implement the outbox relay and consumer, and extend the
+
+5
+00:00:16,635 --> 00:00:18,893
+workflow with payment and compensation.
+
+6
+00:00:19,043 --> 00:00:23,363
+Finish with observability, load measurement, and a failure demonstration.
+
+7
+00:00:23,513 --> 00:00:30,294
+In interviews, begin with functional requirements, scale assumptions, consistency needs, and failure
+
+8
+00:00:30,294 --> 00:00:30,860
+tolerance.
+
+9
+00:00:31,010 --> 00:00:33,870
+Draw the data ownership and transaction boundaries.
+
+10
+00:00:34,020 --> 00:00:39,175
+Trace one request, one concurrent conflict, one timeout, and one restart.
+
+11
+00:00:39,325 --> 00:00:42,462
+Explain why you chose a design and what evidence would cause you
+
+12
+00:00:42,462 --> 00:00:43,247
+to change it.
+
+13
+00:00:43,397 --> 00:00:46,465
+Do not present every extension as already implemented.
+
+14
+00:00:46,615 --> 00:00:51,220
+A strong portfolio demonstration shows two clients buying the last item, a
+
+15
+00:00:51,220 --> 00:00:55,825
+duplicate checkout returning the same order, an inventory timeout leaving a pending
+
+16
+00:00:55,825 --> 00:00:59,662
+order, and a recovered retry confirming it without reserving twice.
+
+17
+00:00:59,812 --> 00:01:06,113
+Include test output, commands, schema migrations, and a concise architecture decision record.
+
+18
+00:01:06,263 --> 00:01:12,508
+Run a 45-minute mock interview: five minutes requirements, ten architecture and schema,
+
+19
+00:01:12,508 --> 00:01:18,753
+ten concurrency and transactions, ten distributed failures, and ten security, operations, and
+
+20
+00:01:18,753 --> 00:01:19,274
+tradeoffs.
+
+21
+00:01:19,424 --> 00:01:25,095
+Score correctness, clarity, data ownership, failure handling, and evidence from one to
+
+22
+00:01:25,095 --> 00:01:25,568
+five.
+
+23
+00:01:25,718 --> 00:01:29,756
+Any answer claiming that a timeout proves failure or that an outbox
+
+24
+00:01:29,756 --> 00:01:31,438
+prevents all duplicates needs revision.
+
+25
+00:01:31,588 --> 00:01:34,902
+Use a runnable experiment to resolve your weakest assumption.
+
+26
+00:01:35,052 --> 00:01:35,723
+Question.
+
+27
+00:01:35,873 --> 00:01:39,109
+How do you choose between a monolith and microservices?
+
+28
+00:01:39,259 --> 00:01:39,836
+Answer.
+
+29
+00:01:39,986 --> 00:01:46,325
+Compare team ownership, deployment independence, scaling needs, domain stability, and operational cost;
+
+30
+00:01:46,325 --> 00:01:50,551
+choose the simplest architecture that satisfies the constraints.
+
+31
+00:01:50,701 --> 00:01:51,372
+Question.
+
+32
+00:01:51,522 --> 00:01:53,859
+What makes an advanced answer convincing?
+
+33
+00:01:54,009 --> 00:01:54,585
+Answer.
+
+34
+00:01:54,735 --> 00:02:00,803
+Precise invariants, explicit transaction and failure boundaries, measured tradeoffs, and a recovery
+
+35
+00:02:00,803 --> 00:02:02,826
+story supported by tests.

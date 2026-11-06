@@ -1,0 +1,19 @@
+Agentic AI with Java
+14 Prompt injection and secure agent boundaries
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Prompt injection occurs when untrusted content attempts to redirect an application’s behavior. It may arrive in a user message, a retrieved page, a tool response, or another agent’s output. A model that reads instructions and data in the same context can confuse their authority. Delimiters and warning prompts help but are not sufficient controls.
+
+How to reason about it
+Limit tool authority, validate arguments, enforce account access in services, restrict network destinations, and require explicit approval for sensitive effects. Redact secrets before they enter model context. An output filter alone cannot undo an unauthorized database read or external transmission that already happened.
+
+Worked example
+The lab has no arbitrary URL tool, no shell tool, and no write tool. OllamaModel accepts only local HTTP endpoints. A model request for another customer’s order receives no private facts. These controls reduce the damage a bad decision can cause, although they do not guarantee that generated prose is truthful or appropriate.
+
+Practice and model answer
+Threat-model a document assistant with file upload and URL fetching. List assets, untrusted inputs, possible tool effects, and an abuse test for each boundary. Explain how redirects and internal IP addresses affect a URL allowlist. A safe fetcher validates resolved destinations and every redirect, blocks prohibited networks, caps response size and time, and uses narrow egress rules. Uploaded content is parsed in an isolated pipeline. A malicious document never gains tool permissions simply by being retrieved.
+
+Interview check
+Question. Can another agent’s output be trusted automatically? Answer. No. It is another untrusted input unless verified through an explicit contract and authorization boundary. Question. What is least privilege for tools? Answer. Expose only the smallest capabilities and data scope required by the current authenticated task.

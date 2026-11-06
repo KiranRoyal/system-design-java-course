@@ -1,4 +1,18 @@
-# System Design with Java
+# Java learning courses
+
+Personal learning repository for **KiranRoyal**, covering practical projects and interview preparation.
+
+| Track | Lessons | Original videos | Start here |
+|---|---:|---:|---|
+| Agentic AI with Java | 20 | 38.3 minutes | [Course and downloads](tracks/agentic-ai-java/README.md) |
+| Java Spring Boot Hibernate and microservices | 24 | 44.7 minutes | [Course and downloads](tracks/spring-boot-hibernate-microservices/README.md) |
+| System design with Java | 24 | Sample walkthrough | [Original guide](docs/System_Design_with_Java.docx) |
+
+The two new tracks include **44 narrated English topic videos**, captions, transcripts, **two editable Word guides**, **44 practice tasks**, **88 interview questions with answers**, and Java projects. The videos are concise synthesized slide lectures; longer lectures by original creators are linked in each track. Advanced integrations are clearly marked as exercises.
+
+Start with Java/Spring lessons 01–04 if Java is new. Then follow the Spring track for backend engineering and the Agentic AI track for model-driven applications. Each track has its own build commands and verification report; the original system-design lab commands below apply only to that original course.
+
+# Original System Design with Java course
 
 A 16-week learning package for building systems, interview preparation, and production design reviews.
 

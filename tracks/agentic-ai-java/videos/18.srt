@@ -1,0 +1,143 @@
+1
+00:00:00,000 --> 00:00:05,175
+The Model Context Protocol standardizes how applications connect to tools and other
+
+2
+00:00:05,175 --> 00:00:06,038
+context providers.
+
+3
+00:00:06,188 --> 00:00:10,459
+It defines a transport and message contract; it does not make a
+
+4
+00:00:10,459 --> 00:00:14,730
+server trustworthy or grant a user permission to access all advertised capabilities.
+
+5
+00:00:14,880 --> 00:00:20,376
+Authenticate the connection, authorize each operation, and review the actual tool behavior.
+
+6
+00:00:20,526 --> 00:00:25,754
+Multi-agent designs divide work into roles such as retrieval, drafting, and review.
+
+7
+00:00:25,904 --> 00:00:31,755
+Their messages need explicit schemas, source provenance, deadlines, and a single authority
+
+8
+00:00:31,755 --> 00:00:33,217
+for state-changing actions.
+
+9
+00:00:33,367 --> 00:00:36,479
+Correlated model errors can survive several reviewers.
+
+10
+00:00:36,629 --> 00:00:40,404
+Begin with a single bounded workflow and add agents only when measurement
+
+11
+00:00:40,404 --> 00:00:41,347
+shows a benefit.
+
+12
+00:00:41,497 --> 00:00:46,009
+A research worker can propose policy evidence, a support worker can draft
+
+13
+00:00:46,009 --> 00:00:49,018
+an answer, and a verifier can check citations.
+
+14
+00:00:49,168 --> 00:00:50,661
+None should approve a refund.
+
+15
+00:00:50,811 --> 00:00:55,328
+A coordinator merges results under one task ID and rejects evidence outside
+
+16
+00:00:55,328 --> 00:00:56,833
+the customer’s access scope.
+
+17
+00:00:56,983 --> 00:01:02,529
+The supplied capstone uses one agent; MCP servers and cooperating agents are
+
+18
+00:01:02,529 --> 00:01:03,915
+advanced extension projects.
+
+19
+00:01:04,065 --> 00:01:07,906
+Write an MCP tool contract for read-only order lookup and a threat
+
+20
+00:01:07,906 --> 00:01:09,506
+model for an untrusted server.
+
+21
+00:01:09,656 --> 00:01:14,014
+Then compare a single-agent answer with a three-stage workflow on the same
+
+22
+00:01:14,014 --> 00:01:14,740
+evaluation cases.
+
+23
+00:01:14,890 --> 00:01:19,960
+Record extra model calls, latency, task success, and failure modes.
+
+24
+00:01:20,110 --> 00:01:25,635
+Keep credentials out of prompts and distinguish transport authentication from business authorization.
+
+25
+00:01:25,785 --> 00:01:30,204
+If the multi-agent version is slower without a measurable quality gain, retain
+
+26
+00:01:30,204 --> 00:01:31,308
+the simpler workflow.
+
+27
+00:01:31,458 --> 00:01:32,130
+Question.
+
+28
+00:01:32,280 --> 00:01:34,457
+Does MCP solve authorization?
+
+29
+00:01:34,607 --> 00:01:35,183
+Answer.
+
+30
+00:01:35,333 --> 00:01:35,817
+No.
+
+31
+00:01:35,967 --> 00:01:41,247
+It standardizes interaction; the application and server must enforce access policy.
+
+32
+00:01:41,397 --> 00:01:42,068
+Question.
+
+33
+00:01:42,218 --> 00:01:44,856
+What prevents agents from endlessly delegating?
+
+34
+00:01:45,006 --> 00:01:45,583
+Answer.
+
+35
+00:01:45,733 --> 00:01:51,903
+A coordinator-owned task graph, bounded depth and calls, explicit completion criteria, and
+
+36
+00:01:51,903 --> 00:01:52,417
+deadlines.

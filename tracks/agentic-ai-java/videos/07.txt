@@ -1,0 +1,19 @@
+Agentic AI with Java
+07 Bounded agent loops and stopping conditions
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+A tool loop alternates between a model decision and application execution. Each iteration consumes time, tokens, and possibly a scarce downstream resource. Define a maximum number of model calls, a deadline, input and output limits, and a successful stopping condition. The lab allows at most five model calls in Main and rejects an unfinished loop when its budget is exhausted.
+
+How to reason about it
+A deadline check between steps does not interrupt a blocked call. Network adapters need their own connection and response timeouts, and tool implementations must avoid unbounded blocking. A thread interrupt is cooperative, not a universal kill switch. Bound the work at every dependency boundary and distinguish a partial result from completed success.
+
+Worked example
+A defective model may request lookupOrder forever. AgentTest runs this behavior and expects a budget-exhausted exception. A tool may return too much text; the engine rejects it rather than growing history indefinitely. The current HTTP adapter checks response size after buffering, so a production ingress limit or streaming cap remains a hardening task.
+
+Practice and model answer
+Make a model return the same tool request forever. Then implement a repeated-action detector and compare it with the absolute call limit. Explain why both may be useful. The call limit guarantees a finite number of decisions. A repeated-action detector can stop waste earlier, but identical calls may legitimately produce changed results. Include arguments and relevant state in the detector and retain the absolute budget as the reliable outer bound.
+
+Interview check
+Question. Does a circuit breaker replace a deadline? Answer. No. A breaker controls admission after failures; each admitted call still needs a timeout. Question. What is a correct budget-exhausted result? Answer. A controlled incomplete outcome with useful available evidence, not a fabricated successful answer.

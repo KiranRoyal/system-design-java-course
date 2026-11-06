@@ -1,0 +1,112 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.489
+An embedding maps text into a numeric vector so that a chosen
+
+00:00:04.489 --> 00:00:06.359
+similarity function can compare representations.
+
+00:00:06.509 --> 00:00:11.477
+Cosine similarity measures the angle between vectors; a dot product also depends
+
+00:00:11.477 --> 00:00:13.961
+on magnitude unless vectors are normalized.
+
+00:00:14.111 --> 00:00:17.537
+The meaning of distance depends on the embedding model and its training.
+
+00:00:17.687 --> 00:00:21.151
+Vectors from different models or dimensions are not interchangeable.
+
+00:00:21.301 --> 00:00:26.175
+Approximate nearest-neighbor indexes trade exactness for search speed and memory use.
+
+00:00:26.325 --> 00:00:29.073
+Evaluate their recall on representative data.
+
+00:00:29.223 --> 00:00:34.400
+Hybrid retrieval combines lexical and vector candidates, which can help with exact
+
+00:00:34.400 --> 00:00:36.557
+identifiers as well as paraphrases.
+
+00:00:36.707 --> 00:00:40.431
+A reranker may improve final ordering but adds latency and cost.
+
+00:00:40.581 --> 00:00:44.467
+Access-control filters must remain effective throughout the pipeline.
+
+00:00:44.617 --> 00:00:49.441
+Retriever.cosine returns one for parallel nonzero vectors and zero for a zero
+
+00:00:49.441 --> 00:00:51.452
+vector in this teaching implementation.
+
+00:00:51.602 --> 00:00:55.805
+That arithmetic test does not demonstrate semantic search: the lab does not
+
+00:00:55.805 --> 00:00:57.556
+ship a pretrained embedding model.
+
+00:00:57.706 --> 00:01:02.256
+The extension replaces lexical scoring with real embeddings and compares both methods
+
+00:01:02.256 --> 00:01:04.532
+on the same labeled policy questions.
+
+00:01:04.682 --> 00:01:08.081
+Implement a vector-backed retriever using a local embedding model.
+
+00:01:08.231 --> 00:01:13.353
+Store model identifier, dimension, chunk version, and tenant with each vector.
+
+00:01:13.503 --> 00:01:15.693
+Rebuild the index when the model changes.
+
+00:01:15.843 --> 00:01:20.550
+Use actual embedding outputs rather than random vectors to claim semantic quality.
+
+00:01:20.700 --> 00:01:26.424
+Compare lexical recall, vector recall, hybrid recall, latency, and storage.
+
+00:01:26.574 --> 00:01:29.639
+Test wrong dimensions and cross-tenant near-duplicates.
+
+00:01:29.789 --> 00:01:33.794
+A model migration normally needs separate indexes until the new corpus is
+
+00:01:33.794 --> 00:01:34.128
+ready.
+
+00:01:34.278 --> 00:01:34.949
+Question.
+
+00:01:35.099 --> 00:01:37.494
+Why can vector search miss a product code?
+
+00:01:37.644 --> 00:01:38.220
+Answer.
+
+00:01:38.370 --> 00:01:43.504
+Embedding similarity may not preserve exact string identity; lexical matching is often
+
+00:01:43.504 --> 00:01:44.787
+useful alongside it.
+
+00:01:44.937 --> 00:01:45.608
+Question.
+
+00:01:45.758 --> 00:01:47.239
+Does nearest mean relevant?
+
+00:01:47.389 --> 00:01:47.965
+Answer.
+
+00:01:48.116 --> 00:01:48.599
+No.
+
+00:01:48.749 --> 00:01:53.164
+An index always has a nearest candidate even when no candidate answers
+
+00:01:53.164 --> 00:01:56.107
+the question; use evaluation and an abstention policy.

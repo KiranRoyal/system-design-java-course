@@ -1,0 +1,19 @@
+Agentic AI with Java
+10 Retrieval ingestion and chunking
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Retrieval begins before the query. Ingest a document, retain its source and version, split it into meaningful chunks, attach access-control metadata, and index the result. Chunk size controls a tradeoff: small chunks can lose context, while large chunks can dilute relevance and consume more prompt space. Preserve headings and document boundaries where possible.
+
+How to reason about it
+The supplied Retriever is a lexical baseline. It lowercases words, calculates query-word overlap, filters by tenant, and returns a bounded ranked list. It is intentionally simple and cannot understand synonyms reliably. A baseline is useful because advanced retrieval should demonstrate an improvement on a fixed set of questions.
+
+Worked example
+A red-tenant policy chunk contains delayed order support review. A blue-tenant chunk contains private refund details. Searching as red excludes blue before ranking. The ranking cannot accidentally leak a highly similar blue document because that document never enters the candidate set.
+
+Practice and model answer
+Create ten policy chunks and five questions with known relevant chunk IDs. Measure recall at three: the fraction of relevant chunks found among the first three results. Add a synonym-only question that the lexical baseline misses. Store relevance labels before changing the ranking function. Report per-question results and aggregate recall, including empty-result cases. Do not improve a metric by removing hard questions. Keep tenant isolation as a binary invariant independent of relevance quality.
+
+Interview check
+Question. Why keep source versions? Answer. An answer must be traceable to the policy that was active when it was produced, and updates need re-indexing. Question. Is chunk overlap always beneficial? Answer. No. It can preserve boundary context but also duplicates evidence and increases index and prompt size.

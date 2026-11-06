@@ -1,0 +1,19 @@
+Agentic AI with Java
+02 Java foundations for AI applications
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Java records represent small data carriers such as Context, Decision, and Result. An interface separates a capability from its implementation: Agent.Model can be backed by a queue for tests or an HTTP adapter for live inference. Constructor injection makes dependencies explicit and allows a fixed clock in tests. Exceptions represent rejected input, exhausted budgets, and dependency failures.
+
+How to reason about it
+Use immutable snapshots across boundaries. List.copyOf prevents a model adapter from changing the engine’s history collection, although it does not magically make arbitrary nested objects immutable. Map.copyOf rejects null keys and values. Keep account identity in trusted application context rather than accepting it from generated text. Generic collections preserve types at compile time, while JSON entering from a network still needs runtime validation.
+
+Worked example
+Agent.run receives Context with tenant red and user alice. SupportTools gets that same context for every tool call. A generated tenant field is rejected because lookupOrder accepts only orderId. This separation is more valuable than putting an instruction saying never read another tenant in the prompt.
+
+Practice and model answer
+Find every mutable collection in Agent and ApprovalLedger. Add a test that a model cannot add a message to its input history. Explain why synchronized is used in the in-memory ledger. The engine owns its ArrayList and gives the model an immutable snapshot. The ledger synchronizes a compound check-and-record operation so concurrent approvals produce one receipt. This protects one JVM only; durable cross-instance coordination requires a database transaction or equivalent authority.
+
+Interview check
+Question. Why inject Clock? Answer. Expiry and deadlines become deterministic test inputs instead of tests that sleep. Question. Does a record make all contained data immutable? Answer. No. Its references are final, but a mutable collection held by a record can still change unless copied or wrapped appropriately.

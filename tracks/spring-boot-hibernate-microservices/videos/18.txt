@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+18 HTTP clients timeouts retries and resilience
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Every remote call can fail before sending, during processing, or after the server commits but before the reply arrives. Configure connection and response timeouts and fit them within a total request deadline. A retry is safe only when the operation’s semantics and identity support it. Use bounded attempts with backoff and jitter for genuinely retryable failures.
+
+How to reason about it
+Circuit breakers reduce calls to a failing dependency, while bulkheads limit how much capacity one dependency can occupy. Neither creates business correctness. Avoid holding database locks or transactions across slow network calls. Record unknown outcomes explicitly instead of guessing that a timeout means rejection.
+
+Worked example
+InventoryClient uses a one-second connection timeout and a two-second read timeout. A 409 or 404 becomes a known rejection; transport failures and server errors remain UNKNOWN. OrderService leaves the order PENDING and can reconcile by repeating the same reservation identity. A test exercises an actual delayed HTTP response.
+
+Practice and model answer
+Run the inventory mock in success, outage, and delayed scenarios. Start orders against that endpoint. Verify that a timeout produces PENDING and that retrying after recovery confirms the same order. Preserve the idempotency key and order ID across attempts. Do not translate a timeout into insufficient stock. Measure the elapsed time and verify that the HTTP client’s timeout is active. The mock demonstrates caller behavior; the real inventory smoke test verifies the normal integration.
+
+Interview check
+Question. What is a retry storm? Answer. Many callers repeatedly retrying a failing dependency, multiplying load and delaying recovery. Question. Why keep the order pending after a timeout? Answer. Inventory may have reserved stock even though the response was lost; reconciliation is required.

@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+24 Commerce capstone and interview practice
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Build the capstone in milestones. First run the two local services and explain their contracts. Then add order lines and query-performance tests, run PostgreSQL migrations, add authentication and ownership checks, implement the outbox relay and consumer, and extend the workflow with payment and compensation. Finish with observability, load measurement, and a failure demonstration.
+
+How to reason about it
+In interviews, begin with functional requirements, scale assumptions, consistency needs, and failure tolerance. Draw the data ownership and transaction boundaries. Trace one request, one concurrent conflict, one timeout, and one restart. Explain why you chose a design and what evidence would cause you to change it. Do not present every extension as already implemented.
+
+Worked example
+A strong portfolio demonstration shows two clients buying the last item, a duplicate checkout returning the same order, an inventory timeout leaving a pending order, and a recovered retry confirming it without reserving twice. Include test output, commands, schema migrations, and a concise architecture decision record.
+
+Practice and model answer
+Run a 45-minute mock interview: five minutes requirements, ten architecture and schema, ten concurrency and transactions, ten distributed failures, and ten security, operations, and tradeoffs. Score correctness, clarity, data ownership, failure handling, and evidence from one to five. Any answer claiming that a timeout proves failure or that an outbox prevents all duplicates needs revision. Use a runnable experiment to resolve your weakest assumption.
+
+Interview check
+Question. How do you choose between a monolith and microservices? Answer. Compare team ownership, deployment independence, scaling needs, domain stability, and operational cost; choose the simplest architecture that satisfies the constraints. Question. What makes an advanced answer convincing? Answer. Precise invariants, explicit transaction and failure boundaries, measured tradeoffs, and a recovery story supported by tests.

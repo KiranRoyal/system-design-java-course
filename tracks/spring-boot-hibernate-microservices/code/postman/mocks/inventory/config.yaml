@@ -1,0 +1,15 @@
+version: 1
+id: b82c833e-20e2-42cd-9b50-4d2ff1712cb3
+name: Local commerce learning API
+slug: local-commerce-learning-api
+protocol: http
+interceptRequests: true
+port: 18083
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true
+generatedFrom:
+  type: spec
+  mode: static
+  path: ../../../contracts/inventory.openapi.json

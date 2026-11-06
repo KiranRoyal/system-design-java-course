@@ -1,0 +1,100 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:06.998
+HTTP is a request-response protocol with methods, headers, status codes, and representations.
+
+00:00:07.148 --> 00:00:12.044
+A REST-style API exposes resources and uses method semantics consistently.
+
+00:00:12.194 --> 00:00:16.343
+GET should be safe; POST commonly creates or executes an operation.
+
+00:00:16.493 --> 00:00:21.688
+Idempotence means repeated equivalent requests have the same intended effect, not necessarily
+
+00:00:21.688 --> 00:00:23.420
+the same response bytes.
+
+00:00:23.570 --> 00:00:31.128
+Define the contract before implementation: path, method, input schema, authentication, pagination, success
+
+00:00:31.128 --> 00:00:33.017
+responses, and errors.
+
+00:00:33.167 --> 00:00:38.488
+Distinguish 400 for invalid input, 404 for missing accessible resources, 409 for
+
+00:00:38.488 --> 00:00:43.808
+a state conflict, and 202 for accepted work whose outcome is pending.
+
+00:00:43.958 --> 00:00:47.101
+A timeout does not tell the client whether the server committed.
+
+00:00:47.251 --> 00:00:52.167
+The inventory API accepts POST /reservations with an Idempotency-Key and a product
+
+00:00:52.167 --> 00:00:52.986
+and quantity.
+
+00:00:53.136 --> 00:00:57.424
+The orders API returns a PENDING order with 202 when inventory’s outcome
+
+00:00:57.424 --> 00:00:58.138
+is unknown.
+
+00:00:58.288 --> 00:01:01.269
+A repeated logical checkout reuses the same key.
+
+00:01:01.419 --> 00:01:06.111
+The provided contract files describe these semantics for the local learning services.
+
+00:01:06.261 --> 00:01:12.768
+Write an API contract for cancelling an order, including already-cancelled, already-shipped, unknown-order,
+
+00:01:12.768 --> 00:01:14.395
+and unauthorized cases.
+
+00:01:14.545 --> 00:01:17.409
+Decide which responses may safely be retried.
+
+00:01:17.559 --> 00:01:22.871
+Make cancellation idempotent for the same intent, validate ownership, and return a
+
+00:01:22.871 --> 00:01:25.528
+conflict when shipment makes cancellation impossible.
+
+00:01:25.678 --> 00:01:30.063
+Define whether inaccessible and absent resources share a 404 response.
+
+00:01:30.213 --> 00:01:34.563
+A client should preserve the original logical request identity on retries.
+
+00:01:34.713 --> 00:01:35.385
+Question.
+
+00:01:35.535 --> 00:01:39.259
+Is HTTP 200 proof that the business task succeeded?
+
+00:01:39.409 --> 00:01:39.985
+Answer.
+
+00:01:40.135 --> 00:01:44.535
+Only if the documented response semantics say so; a response may contain
+
+00:01:44.535 --> 00:01:46.735
+a pending or rejected business state.
+
+00:01:46.885 --> 00:01:47.556
+Question.
+
+00:01:47.706 --> 00:01:49.776
+What does a client timeout imply?
+
+00:01:49.926 --> 00:01:50.502
+Answer.
+
+00:01:50.652 --> 00:01:51.883
+The result is unknown.
+
+00:01:52.033 --> 00:01:54.867
+The server may have committed before the connection failed.

@@ -1,0 +1,19 @@
+Java Spring Boot Hibernate and Microservices
+14 Fetching N plus one queries and performance
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+Lazy fetching defers data access until needed, while eager fetching requests related data as part of loading policy. Eager does not guarantee one SQL join or good performance. The N plus one pattern occurs when one query loads parents and subsequent accesses issue one additional query per parent. Measure query count and row volume rather than guessing from annotations.
+
+How to reason about it
+Choose a fetch plan for each use case: a DTO projection, entity graph, fetch join, or batch fetching. Joining several collections can multiply rows dramatically. Combining collection fetch joins with pagination can be unsafe or inefficient depending on the query and provider behavior. Keep the persistence boundary explicit with Open Session in View disabled.
+
+Worked example
+The product list maps simple product fields to DTOs, so it has no relationship traversal. After adding order lines, a dashboard that loads orders and then accesses each line collection can trigger many queries. A two-step paged query or projection can fetch only the data required by the dashboard.
+
+Practice and model answer
+Create fifty orders with several lines each. Record SQL count for a lazy traversal, a DTO projection, and a bounded batch approach. Compare transferred rows and latency as well as query count. One enormous join is not automatically better than several bounded queries. Prevent accidental lazy access after the transaction ends by assembling the DTO inside the intended boundary. Verify the chosen plan on the target database and realistic data size.
+
+Interview check
+Question. Does EAGER solve N plus one? Answer. Not reliably. It specifies when data must be available, not an optimal SQL strategy. Question. Why disable Open Session in View? Answer. It makes database access boundaries explicit and reduces unexpected queries during response rendering.

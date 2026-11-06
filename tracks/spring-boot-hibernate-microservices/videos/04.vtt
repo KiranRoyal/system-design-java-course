@@ -1,0 +1,97 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.950
+Concurrency allows work to overlap; parallelism means work executes at the same
+
+00:00:04.950 --> 00:00:07.012
+time on multiple processing resources.
+
+00:00:07.162 --> 00:00:09.913
+Shared mutable state requires coordination.
+
+00:00:10.063 --> 00:00:14.060
+A compound check followed by an update is not atomic merely because
+
+00:00:14.060 --> 00:00:15.725
+individual field reads are safe.
+
+00:00:15.875 --> 00:00:22.509
+Locks, atomic operations, immutable data, and message passing solve different coordination problems.
+
+00:00:22.659 --> 00:00:27.581
+Java 21 virtual threads reduce the cost of many blocking tasks, but
+
+00:00:27.581 --> 00:00:32.092
+they do not create unlimited database connections, sockets, or provider quota.
+
+00:00:32.242 --> 00:00:34.963
+Bound access to scarce dependencies separately.
+
+00:00:35.113 --> 00:00:40.334
+The JVM manages heap allocation and garbage collection; memory leaks still occur
+
+00:00:40.334 --> 00:00:42.510
+when objects remain reachable unnecessarily.
+
+00:00:42.660 --> 00:00:47.610
+Measure allocation, pauses, thread activity, and pool waits before tuning.
+
+00:00:47.760 --> 00:00:51.345
+InventoryTest launches twenty buyers using virtual threads.
+
+00:00:51.495 --> 00:00:56.319
+Database row locking, rather than the thread type, prevents overselling ten units.
+
+00:00:56.469 --> 00:01:00.889
+Replacing virtual threads with platform threads should preserve the business result.
+
+00:01:01.039 --> 00:01:05.542
+The experiment separates concurrency implementation from correctness authority.
+
+00:01:05.692 --> 00:01:10.135
+Run 100 blocking read tasks with a semaphore allowing ten outbound calls.
+
+00:01:10.285 --> 00:01:13.032
+Record peak active calls and completion time.
+
+00:01:13.182 --> 00:01:17.580
+Add cancellation and ensure interrupted tasks restore or propagate interruption.
+
+00:01:17.730 --> 00:01:22.479
+The semaphore limits dependency pressure while virtual threads make waiting economical.
+
+00:01:22.629 --> 00:01:26.596
+A test should verify the peak active count, not only completion.
+
+00:01:26.746 --> 00:01:30.965
+Do not hold a database transaction while waiting for unrelated remote work.
+
+00:01:31.115 --> 00:01:31.786
+Question.
+
+00:01:31.936 --> 00:01:34.018
+Do virtual threads prevent races?
+
+00:01:34.168 --> 00:01:34.744
+Answer.
+
+00:01:34.894 --> 00:01:35.378
+No.
+
+00:01:35.528 --> 00:01:40.995
+Shared-state correctness still requires appropriate synchronization or transactional coordination.
+
+00:01:41.145 --> 00:01:41.816
+Question.
+
+00:01:41.966 --> 00:01:44.465
+Why can a service be slow with low CPU?
+
+00:01:44.615 --> 00:01:45.191
+Answer.
+
+00:01:45.341 --> 00:01:50.519
+It may be waiting on connections, locks, queues, disk, or downstream calls
+
+00:01:50.519 --> 00:01:52.676
+rather than executing CPU work.

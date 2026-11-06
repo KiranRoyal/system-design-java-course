@@ -1,0 +1,19 @@
+Agentic AI with Java
+03 Language models tokens and context
+
+Original lesson. Synthesized English voice: macOS Samantha. Sentence timing is measured; long sentence caption splits use proportional timing.
+
+Understand the concept
+A language model predicts token sequences conditioned on its input. Tokens are model-specific pieces of text, not necessarily words. A context window limits the information that can be considered in one request; it is not durable memory. More context may increase cost and latency and may distract from relevant evidence. An output token limit bounds generation length, not factual accuracy.
+
+How to reason about it
+Temperature influences sampling, but setting it to zero does not guarantee identical behavior across providers, model revisions, or hardware. A confident sentence is not a calibrated probability. Treat generated statements as claims that may require verification. Separate the model’s language capability from access to current business data, which must come from retrieval or tools.
+
+Worked example
+The question Where is A100 contains almost no order information. Without the lookup tool, the model cannot know today’s status. The lab sends a finite history and limits prediction length. If a model server returns an error, the adapter raises a dependency failure instead of displaying the error body as an answer.
+
+Practice and model answer
+Measure prompt length before and after ten retrieved documents are added. Estimate cost for 10,000 requests using a price sheet you verify on the day of measurement. Record both average and worst-case token usage. Use the actual model tokenizer or provider usage counters, not a fixed words-to-tokens rule. Multiply separately by input and output rates, add repeated agent calls, and state whether caching or batch discounts apply. Keep costs as assumptions until measured.
+
+Interview check
+Question. Does a large context window solve memory? Answer. It supplies a larger temporary input budget; persistence, selection, access control, and forgetting remain application responsibilities. Question. Why can low temperature still produce an incorrect answer? Answer. Sampling controls variability, not whether the prompt contains enough evidence or whether the model learned the fact correctly.

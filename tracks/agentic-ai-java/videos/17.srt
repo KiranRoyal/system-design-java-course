@@ -1,0 +1,135 @@
+1
+00:00:00,000 --> 00:00:05,384
+Agent latency includes every model request, tool call, queue wait, and retry.
+
+2
+00:00:05,534 --> 00:00:08,701
+A three-step agent can be much slower than one completion.
+
+3
+00:00:08,851 --> 00:00:13,180
+Propagate a total deadline and reserve enough time for final response assembly.
+
+4
+00:00:13,330 --> 00:00:19,085
+Use finite retries with jitter for retryable failures, and avoid automatically retrying
+
+5
+00:00:19,085 --> 00:00:20,045
+non-idempotent actions.
+
+6
+00:00:20,195 --> 00:00:25,338
+Concurrency limits protect model providers, database pools, and tool services.
+
+7
+00:00:25,488 --> 00:00:29,595
+A circuit breaker can temporarily stop calls to a failing dependency.
+
+8
+00:00:29,745 --> 00:00:32,330
+Rate limits and token budgets protect spend.
+
+9
+00:00:32,480 --> 00:00:36,817
+Cache only results whose scope, freshness, and privacy rules are understood; a
+
+10
+00:00:36,817 --> 00:00:40,793
+cache key that omits tenant identity can become a data leak.
+
+11
+00:00:40,942 --> 00:00:44,153
+OllamaModel has a connection timeout and request timeout.
+
+12
+00:00:44,303 --> 00:00:47,122
+Agent checks its total deadline between steps.
+
+13
+00:00:47,272 --> 00:00:51,233
+If the provider returns 503, the lab fails clearly instead of treating
+
+14
+00:00:51,233 --> 00:00:53,213
+the body as a model answer.
+
+15
+00:00:53,363 --> 00:00:58,046
+The teaching adapter does not implement automatic retries, which keeps the failure
+
+16
+00:00:58,046 --> 00:01:00,388
+path explicit for the first exercises.
+
+17
+00:01:00,538 --> 00:01:04,117
+Simulate a slow model endpoint and a 503 response.
+
+18
+00:01:04,267 --> 00:01:08,404
+Add at most one retry for a read-only model request, with a
+
+19
+00:01:08,404 --> 00:01:09,094
+remaining-budget check.
+
+20
+00:01:09,244 --> 00:01:12,859
+Measure how retry traffic behaves under ten concurrent users.
+
+21
+00:01:13,009 --> 00:01:16,204
+Stop when the remaining budget cannot support another attempt.
+
+22
+00:01:16,354 --> 00:01:20,032
+Avoid retrying validation errors or unauthorized requests.
+
+23
+00:01:20,182 --> 00:01:23,282
+Compare success rate against added traffic and latency.
+
+24
+00:01:23,432 --> 00:01:28,259
+A successful retry policy should improve useful outcomes without amplifying an outage
+
+25
+00:01:28,259 --> 00:01:29,466
+into uncontrolled load.
+
+26
+00:01:29,616 --> 00:01:30,287
+Question.
+
+27
+00:01:30,437 --> 00:01:32,936
+What is the unit of AI cost optimization?
+
+28
+00:01:33,086 --> 00:01:33,663
+Answer.
+
+29
+00:01:33,813 --> 00:01:38,664
+Cost per successfully completed task under the required quality and safety constraints,
+
+30
+00:01:38,664 --> 00:01:40,686
+not merely cost per token.
+
+31
+00:01:40,836 --> 00:01:41,507
+Question.
+
+32
+00:01:41,657 --> 00:01:43,866
+Why can retries make outages worse?
+
+33
+00:01:44,016 --> 00:01:44,592
+Answer.
+
+34
+00:01:44,742 --> 00:01:48,688
+They multiply traffic when the dependency has the least spare capacity.

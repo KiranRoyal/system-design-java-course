@@ -1,0 +1,103 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:03.805
+A microservice owns a coherent business capability and its data.
+
+00:00:03.955 --> 00:00:09.214
+Splitting by technical layer, such as controller service and database service, often
+
+00:00:09.214 --> 00:00:10.529
+creates excessive coupling.
+
+00:00:10.679 --> 00:00:16.802
+Begin with domain boundaries, team ownership, consistency requirements, and deployment needs.
+
+00:00:16.952 --> 00:00:20.946
+A modular monolith can be a better starting point when independent deployment
+
+00:00:20.946 --> 00:00:22.278
+is not yet valuable.
+
+00:00:22.428 --> 00:00:28.543
+A service boundary introduces network failure, latency, versioning, and operational overhead.
+
+00:00:28.693 --> 00:00:32.453
+Keep contracts explicit and avoid cross-service database joins.
+
+00:00:32.603 --> 00:00:35.922
+Share identifiers and events rather than entity classes.
+
+00:00:36.072 --> 00:00:40.397
+A small shared library may reduce repetition, but a shared domain model
+
+00:00:40.397 --> 00:00:42.559
+can force services to upgrade together.
+
+00:00:42.709 --> 00:00:46.271
+Inventory owns products, stock, and reservations.
+
+00:00:46.421 --> 00:00:50.685
+Orders owns checkout intent, order status, and outbox events.
+
+00:00:50.835 --> 00:00:55.167
+Orders calls the inventory API with its order ID as the reservation
+
+00:00:55.167 --> 00:00:55.528
+identity.
+
+00:00:55.678 --> 00:01:00.329
+It does not query the inventory database or assume a distributed transaction
+
+00:01:00.329 --> 00:01:01.492
+spans both databases.
+
+00:01:01.642 --> 00:01:07.582
+Design a commerce boundary map including catalog, inventory, orders, payment, and shipping.
+
+00:01:07.732 --> 00:01:12.519
+Identify which capabilities could remain modules in one application and which need
+
+00:01:12.519 --> 00:01:14.114
+independent scaling or ownership.
+
+00:01:14.264 --> 00:01:19.972
+Use concrete reasons for each split: independent release cadence, different availability needs,
+
+00:01:19.972 --> 00:01:22.825
+data ownership, or measured scaling pressure.
+
+00:01:22.975 --> 00:01:26.511
+Document the added failure modes and communication contracts.
+
+00:01:26.661 --> 00:01:30.206
+Do not create a service merely because a domain noun exists.
+
+00:01:30.356 --> 00:01:31.027
+Question.
+
+00:01:31.177 --> 00:01:34.303
+Why is a shared database risky for microservices?
+
+00:01:34.453 --> 00:01:35.029
+Answer.
+
+00:01:35.179 --> 00:01:39.806
+It allows hidden coupling and independent code changes to violate another service’s
+
+00:01:39.806 --> 00:01:40.192
+assumptions.
+
+00:01:40.342 --> 00:01:41.013
+Question.
+
+00:01:41.163 --> 00:01:43.348
+When would you prefer a modular monolith?
+
+00:01:43.498 --> 00:01:44.075
+Answer.
+
+00:01:44.225 --> 00:01:48.627
+When domain boundaries are still evolving or the team cannot justify the
+
+00:01:48.627 --> 00:01:50.462
+operational cost of independent services.

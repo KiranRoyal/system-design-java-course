@@ -1,0 +1,112 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:03.852
+A language model predicts token sequences conditioned on its input.
+
+00:00:04.002 --> 00:00:08.367
+Tokens are model-specific pieces of text, not necessarily words.
+
+00:00:08.517 --> 00:00:12.470
+A context window limits the information that can be considered in one
+
+00:00:12.470 --> 00:00:14.447
+request; it is not durable memory.
+
+00:00:14.597 --> 00:00:18.963
+More context may increase cost and latency and may distract from relevant
+
+00:00:18.963 --> 00:00:19.327
+evidence.
+
+00:00:19.477 --> 00:00:24.048
+An output token limit bounds generation length, not factual accuracy.
+
+00:00:24.198 --> 00:00:29.800
+Temperature influences sampling, but setting it to zero does not guarantee identical
+
+00:00:29.800 --> 00:00:33.068
+behavior across providers, model revisions, or hardware.
+
+00:00:33.218 --> 00:00:36.420
+A confident sentence is not a calibrated probability.
+
+00:00:36.570 --> 00:00:40.471
+Treat generated statements as claims that may require verification.
+
+00:00:40.621 --> 00:00:44.997
+Separate the model’s language capability from access to current business data, which
+
+00:00:44.997 --> 00:00:47.184
+must come from retrieval or tools.
+
+00:00:47.334 --> 00:00:51.422
+The question Where is A100 contains almost no order information.
+
+00:00:51.572 --> 00:00:55.046
+Without the lookup tool, the model cannot know today’s status.
+
+00:00:55.196 --> 00:00:58.529
+The lab sends a finite history and limits prediction length.
+
+00:00:58.679 --> 00:01:02.477
+If a model server returns an error, the adapter raises a dependency
+
+00:01:02.477 --> 00:01:05.642
+failure instead of displaying the error body as an answer.
+
+00:01:05.792 --> 00:01:09.744
+Measure prompt length before and after ten retrieved documents are added.
+
+00:01:09.894 --> 00:01:13.732
+Estimate cost for 10,000 requests using a price sheet you verify on
+
+00:01:13.732 --> 00:01:15.011
+the day of measurement.
+
+00:01:15.161 --> 00:01:17.909
+Record both average and worst-case token usage.
+
+00:01:18.059 --> 00:01:23.108
+Use the actual model tokenizer or provider usage counters, not a fixed
+
+00:01:23.108 --> 00:01:23.949
+words-to-tokens rule.
+
+00:01:24.099 --> 00:01:28.824
+Multiply separately by input and output rates, add repeated agent calls, and
+
+00:01:28.824 --> 00:01:31.581
+state whether caching or batch discounts apply.
+
+00:01:31.731 --> 00:01:33.935
+Keep costs as assumptions until measured.
+
+00:01:34.085 --> 00:01:34.756
+Question.
+
+00:01:34.906 --> 00:01:37.397
+Does a large context window solve memory?
+
+00:01:37.547 --> 00:01:38.124
+Answer.
+
+00:01:38.274 --> 00:01:44.907
+It supplies a larger temporary input budget; persistence, selection, access control, and
+
+00:01:44.907 --> 00:01:47.118
+forgetting remain application responsibilities.
+
+00:01:47.268 --> 00:01:47.939
+Question.
+
+00:01:48.089 --> 00:01:51.238
+Why can low temperature still produce an incorrect answer?
+
+00:01:51.388 --> 00:01:51.964
+Answer.
+
+00:01:52.114 --> 00:01:56.551
+Sampling controls variability, not whether the prompt contains enough evidence or whether
+
+00:01:56.551 --> 00:01:58.770
+the model learned the fact correctly.

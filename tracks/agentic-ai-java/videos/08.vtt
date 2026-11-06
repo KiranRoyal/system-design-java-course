@@ -1,0 +1,121 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.747
+Spring AI provides abstractions for model access, prompts, tools, retrieval, and observability
+
+00:00:05.747 --> 00:00:08.141
+that fit a Spring application.
+
+00:00:08.291 --> 00:00:12.740
+ChatClient offers a fluent interface for building a request, while annotated Java
+
+00:00:12.740 --> 00:00:14.965
+methods can be exposed as tools.
+
+00:00:15.115 --> 00:00:18.488
+Dependency injection supplies configured model clients.
+
+00:00:18.638 --> 00:00:24.581
+Framework convenience does not remove your responsibility for identity, side effects, budgets,
+
+00:00:24.581 --> 00:00:25.571
+and evidence.
+
+00:00:25.721 --> 00:00:31.583
+The supplied optional adapter pins Spring AI 2.0.2 with Spring Boot 4.0.9
+
+00:00:31.583 --> 00:00:33.048
+and Java 21.
+
+00:00:33.198 --> 00:00:38.038
+The core agent project intentionally remains small enough to inspect without learning
+
+00:00:38.038 --> 00:00:39.248
+every framework abstraction.
+
+00:00:39.398 --> 00:00:44.125
+Read the version-matched documentation when upgrading: Spring AI 2 introduced changes in
+
+00:00:44.125 --> 00:00:46.882
+how the tool loop composes with advisors.
+
+00:00:47.032 --> 00:00:51.248
+The optional Spring AI application uses a local Ollama model and one
+
+00:00:51.248 --> 00:00:52.302
+read-only status tool.
+
+00:00:52.452 --> 00:00:56.646
+It runs only when a user explicitly enables the live-demo profile and
+
+00:00:56.646 --> 00:00:58.393
+supplies the installed model name.
+
+00:00:58.543 --> 00:01:04.206
+Compilation verifies Java API compatibility; live model quality requires a separate evaluation
+
+00:01:04.206 --> 00:01:06.566
+on the model actually selected.
+
+00:01:06.716 --> 00:01:10.652
+The framework sample does not inherit the custom engine’s five-call limit.
+
+00:01:10.802 --> 00:01:12.590
+Compile the optional adapter.
+
+00:01:12.740 --> 00:01:16.843
+If you already have Ollama and a suitable tool-capable model, run it
+
+00:01:16.843 --> 00:01:17.184
+locally.
+
+00:01:17.334 --> 00:01:19.958
+Compare the tool trace with the explicit engine.
+
+00:01:20.108 --> 00:01:24.645
+Add an application deadline and a tool-loop limit before broadening its capabilities.
+
+00:01:24.795 --> 00:01:28.629
+Use framework hooks documented for the pinned release, and test the limit
+
+00:01:28.629 --> 00:01:31.185
+with a model that repeatedly requests a tool.
+
+00:01:31.335 --> 00:01:34.793
+Preserve trusted account context outside model arguments.
+
+00:01:34.943 --> 00:01:40.665
+Treat compile success, successful inference, and safe behavior under adversarial inputs as
+
+00:01:40.665 --> 00:01:42.095
+three different results.
+
+00:01:42.245 --> 00:01:42.917
+Question.
+
+00:01:43.067 --> 00:01:46.192
+Why retain a plain Java engine in a Spring AI course?
+
+00:01:46.342 --> 00:01:46.919
+Answer.
+
+00:01:47.069 --> 00:01:53.296
+It makes orchestration, validation, and stopping behavior explicit before framework abstractions hide
+
+00:01:53.296 --> 00:01:54.334
+those details.
+
+00:01:54.484 --> 00:01:55.155
+Question.
+
+00:01:55.305 --> 00:01:57.714
+Does a tool annotation authorize the caller?
+
+00:01:57.864 --> 00:01:58.441
+Answer.
+
+00:01:58.591 --> 00:01:59.074
+No.
+
+00:01:59.224 --> 00:02:04.063
+It exposes a callable capability; authorization must be implemented separately.

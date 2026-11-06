@@ -1,0 +1,106 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.646
+Logs explain discrete events, metrics summarize behavior over time, and traces connect
+
+00:00:05.646 --> 00:00:07.528
+work across service boundaries.
+
+00:00:07.678 --> 00:00:13.394
+Use correlation identifiers and structured fields while avoiding credentials and unnecessary customer
+
+00:00:13.394 --> 00:00:13.870
+data.
+
+00:00:14.020 --> 00:00:21.151
+Measure request rates, errors, latency distributions, pool waits, database contention, and business
+
+00:00:21.151 --> 00:00:21.746
+outcomes.
+
+00:00:21.896 --> 00:00:24.505
+Averages alone can hide slow-tail behavior.
+
+00:00:24.655 --> 00:00:30.715
+Containerization packages runtime dependencies but does not make an application operationally complete.
+
+00:00:30.865 --> 00:00:38.040
+Configure resource limits, health checks, graceful shutdown, secret injection, database backups, and
+
+00:00:38.040 --> 00:00:39.236
+deployment rollback.
+
+00:00:39.386 --> 00:00:42.425
+A successful build is different from a successful rollout.
+
+00:00:42.575 --> 00:00:46.425
+Readiness should reflect whether the instance can serve its intended traffic.
+
+00:00:46.575 --> 00:00:50.558
+The demo exposes health and info through Actuator and binds to loopback.
+
+00:00:50.708 --> 00:00:57.718
+PostgreSQL configuration and migrations prepare the next deployment step, but production authentication,
+
+00:00:57.718 --> 00:01:03.559
+broker delivery, telemetry export, and load-tested capacity remain explicit extensions.
+
+00:01:03.709 --> 00:01:08.505
+A pending-order count and age metric would reveal stuck reconciliation better than
+
+00:01:08.505 --> 00:01:10.103
+HTTP status counts alone.
+
+00:01:10.253 --> 00:01:15.161
+Create a container image, run each service with a separate PostgreSQL database,
+
+00:01:15.161 --> 00:01:17.206
+and load-test a fixed workload.
+
+00:01:17.356 --> 00:01:25.073
+Record hardware, dataset size, concurrency, duration, throughput, error rate, and latency percentiles.
+
+00:01:25.223 --> 00:01:29.755
+Compare measurements under the same conditions and avoid claiming production capacity from
+
+00:01:29.755 --> 00:01:30.888
+a laptop test.
+
+00:01:31.038 --> 00:01:34.402
+Include dependency and database limits in the explanation.
+
+00:01:34.552 --> 00:01:39.243
+Verify restore procedures and schema compatibility as part of recovery, not only
+
+00:01:39.243 --> 00:01:41.198
+that a backup file exists.
+
+00:01:41.348 --> 00:01:42.019
+Question.
+
+00:01:42.169 --> 00:01:44.621
+Why is p95 useful?
+
+00:01:44.771 --> 00:01:45.348
+Answer.
+
+00:01:45.498 --> 00:01:49.903
+It describes the latency below which 95 percent of measured requests fall,
+
+00:01:49.903 --> 00:01:52.473
+revealing tail behavior hidden by the mean.
+
+00:01:52.623 --> 00:01:53.294
+Question.
+
+00:01:53.444 --> 00:01:56.442
+What should a deployment rollback consider besides code?
+
+00:01:56.592 --> 00:01:57.168
+Answer.
+
+00:01:57.318 --> 00:02:03.321
+Schema compatibility, configuration, external effects, queued events, and data written by the
+
+00:02:03.321 --> 00:02:04.322
+newer version.

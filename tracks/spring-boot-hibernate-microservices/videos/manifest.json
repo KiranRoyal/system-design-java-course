@@ -1,0 +1,194 @@
+[
+  {
+    "number": 1,
+    "title": "Java syntax values and methods",
+    "file": "01.mp4",
+    "seconds": 113.49,
+    "bytes": 1613668,
+    "slides": 5
+  },
+  {
+    "number": 2,
+    "title": "Objects interfaces records and exceptions",
+    "file": "02.mp4",
+    "seconds": 114.38,
+    "bytes": 1713158,
+    "slides": 5
+  },
+  {
+    "number": 3,
+    "title": "Collections generics streams and equality",
+    "file": "03.mp4",
+    "seconds": 104.02,
+    "bytes": 1524349,
+    "slides": 5
+  },
+  {
+    "number": 4,
+    "title": "Concurrency virtual threads and the JVM",
+    "file": "04.mp4",
+    "seconds": 112.83,
+    "bytes": 1621000,
+    "slides": 5
+  },
+  {
+    "number": 5,
+    "title": "HTTP REST and API contracts",
+    "file": "05.mp4",
+    "seconds": 115.02,
+    "bytes": 1695075,
+    "slides": 5
+  },
+  {
+    "number": 6,
+    "title": "Spring beans dependency injection and proxies",
+    "file": "06.mp4",
+    "seconds": 110.87,
+    "bytes": 1645439,
+    "slides": 5
+  },
+  {
+    "number": 7,
+    "title": "Spring Boot configuration and application startup",
+    "file": "07.mp4",
+    "seconds": 114.79,
+    "bytes": 1698243,
+    "slides": 5
+  },
+  {
+    "number": 8,
+    "title": "REST controllers DTOs and pagination",
+    "file": "08.mp4",
+    "seconds": 109.79,
+    "bytes": 1617944,
+    "slides": 5
+  },
+  {
+    "number": 9,
+    "title": "Validation error handling and problem details",
+    "file": "09.mp4",
+    "seconds": 112.24,
+    "bytes": 1670485,
+    "slides": 5
+  },
+  {
+    "number": 10,
+    "title": "Testing from domain rules to HTTP boundaries",
+    "file": "10.mp4",
+    "seconds": 112.83,
+    "bytes": 1667973,
+    "slides": 5
+  },
+  {
+    "number": 11,
+    "title": "SQL schema design indexes and transactions",
+    "file": "11.mp4",
+    "seconds": 110.33,
+    "bytes": 1656298,
+    "slides": 5
+  },
+  {
+    "number": 12,
+    "title": "JPA Hibernate entity lifecycle and dirty checking",
+    "file": "12.mp4",
+    "seconds": 110.45,
+    "bytes": 1618134,
+    "slides": 5
+  },
+  {
+    "number": 13,
+    "title": "Entity relationships ownership and aggregates",
+    "file": "13.mp4",
+    "seconds": 100.87,
+    "bytes": 1505973,
+    "slides": 5
+  },
+  {
+    "number": 14,
+    "title": "Fetching N plus one queries and performance",
+    "file": "14.mp4",
+    "seconds": 107.22,
+    "bytes": 1582472,
+    "slides": 5
+  },
+  {
+    "number": 15,
+    "title": "Optimistic locking pessimistic locking and stock",
+    "file": "15.mp4",
+    "seconds": 105.21,
+    "bytes": 1529929,
+    "slides": 5
+  },
+  {
+    "number": 16,
+    "title": "Migrations PostgreSQL and data evolution",
+    "file": "16.mp4",
+    "seconds": 102.76,
+    "bytes": 1499798,
+    "slides": 5
+  },
+  {
+    "number": 17,
+    "title": "Service boundaries and domain ownership",
+    "file": "17.mp4",
+    "seconds": 110.61,
+    "bytes": 1647638,
+    "slides": 5
+  },
+  {
+    "number": 18,
+    "title": "HTTP clients timeouts retries and resilience",
+    "file": "18.mp4",
+    "seconds": 109.41,
+    "bytes": 1600839,
+    "slides": 5
+  },
+  {
+    "number": 19,
+    "title": "Idempotency and concurrent request handling",
+    "file": "19.mp4",
+    "seconds": 111.39,
+    "bytes": 1627400,
+    "slides": 5
+  },
+  {
+    "number": 20,
+    "title": "Transactional outbox messaging and consumers",
+    "file": "20.mp4",
+    "seconds": 105.51,
+    "bytes": 1566245,
+    "slides": 5
+  },
+  {
+    "number": 21,
+    "title": "Sagas compensation and workflow recovery",
+    "file": "21.mp4",
+    "seconds": 112.83,
+    "bytes": 1676900,
+    "slides": 5
+  },
+  {
+    "number": 22,
+    "title": "Authentication authorization and service security",
+    "file": "22.mp4",
+    "seconds": 126.69,
+    "bytes": 1885277,
+    "slides": 5
+  },
+  {
+    "number": 23,
+    "title": "Observability containers and production delivery",
+    "file": "23.mp4",
+    "seconds": 124.47,
+    "bytes": 1853879,
+    "slides": 5
+  },
+  {
+    "number": 24,
+    "title": "Commerce capstone and interview practice",
+    "file": "24.mp4",
+    "seconds": 122.98,
+    "bytes": 1857857,
+    "slides": 5
+  }
+]

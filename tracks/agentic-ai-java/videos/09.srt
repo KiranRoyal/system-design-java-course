@@ -1,0 +1,155 @@
+1
+00:00:00,000 --> 00:00:03,178
+A workflow uses application-defined control flow.
+
+2
+00:00:03,328 --> 00:00:08,601
+Common patterns include a sequence of transformations, routing by request type, parallel
+
+3
+00:00:08,601 --> 00:00:12,117
+independent lookups, and a review step before completion.
+
+4
+00:00:12,267 --> 00:00:16,245
+An agent can be placed inside one stage rather than controlling the
+
+5
+00:00:16,245 --> 00:00:16,908
+entire system.
+
+6
+00:00:17,058 --> 00:00:21,294
+This limits the scope of uncertainty and makes recovery easier to explain.
+
+7
+00:00:21,444 --> 00:00:25,334
+Parallelize independent reads only when they improve end-to-end latency.
+
+8
+00:00:25,484 --> 00:00:30,065
+Limit concurrency with a semaphore or executor capacity, and give every branch
+
+9
+00:00:30,065 --> 00:00:30,829
+a deadline.
+
+10
+00:00:30,979 --> 00:00:35,729
+Do not concurrently execute dependent actions such as reserving stock before validating
+
+11
+00:00:35,729 --> 00:00:36,521
+the product.
+
+12
+00:00:36,671 --> 00:00:41,243
+A failed optional lookup can produce a partial answer; a failed mandatory
+
+13
+00:00:41,243 --> 00:00:43,529
+authorization check must stop the operation.
+
+14
+00:00:43,679 --> 00:00:48,085
+A support workflow first validates the signed-in user, then reads an order
+
+15
+00:00:48,085 --> 00:00:51,757
+and a public policy in parallel, then generates an explanation.
+
+16
+00:00:51,907 --> 00:00:54,817
+Refund execution remains outside this workflow.
+
+17
+00:00:54,967 --> 00:00:59,614
+If policy retrieval fails, the system may report the order status while
+
+18
+00:00:59,614 --> 00:01:02,325
+clearly saying the next-step policy is unavailable.
+
+19
+00:01:02,475 --> 00:01:04,678
+It must not silently assume approval.
+
+20
+00:01:04,828 --> 00:01:08,958
+Implement two bounded read tasks using Java 21 virtual threads.
+
+21
+00:01:09,108 --> 00:01:12,456
+Give one task a delayed response and record total latency.
+
+22
+00:01:12,606 --> 00:01:15,516
+Define which failures permit a partial response.
+
+23
+00:01:15,666 --> 00:01:19,431
+Use a deadline shared by both futures and cancel unfinished work when
+
+24
+00:01:19,431 --> 00:01:21,313
+the response is no longer useful.
+
+25
+00:01:21,463 --> 00:01:24,316
+Restore interrupt status when handling interruption.
+
+26
+00:01:24,466 --> 00:01:28,522
+Limit outbound concurrency independently of the number of virtual threads.
+
+27
+00:01:28,672 --> 00:01:33,181
+A test should verify the partial-result contract, not only that two tasks
+
+28
+00:01:33,181 --> 00:01:33,557
+started.
+
+29
+00:01:33,707 --> 00:01:34,378
+Question.
+
+30
+00:01:34,528 --> 00:01:36,318
+When is parallelization wrong?
+
+31
+00:01:36,468 --> 00:01:37,045
+Answer.
+
+32
+00:01:37,195 --> 00:01:42,231
+When steps depend on prior results, share an unsafe resource, or overload
+
+33
+00:01:42,231 --> 00:01:43,490
+a constrained dependency.
+
+34
+00:01:43,640 --> 00:01:44,311
+Question.
+
+35
+00:01:44,461 --> 00:01:47,138
+Does adding more agents guarantee a better answer?
+
+36
+00:01:47,288 --> 00:01:47,864
+Answer.
+
+37
+00:01:48,014 --> 00:01:48,498
+No.
+
+38
+00:01:48,648 --> 00:01:54,882
+It adds coordination, latency, and correlated error opportunities; compare against a simpler
+
+39
+00:01:54,882 --> 00:01:55,402
+baseline.
