@@ -1,1 +1,1 @@
-PASS: 30 core behavior checks (HTTP integration not run in unit mode).
+PASS: 49 behavior checks, including concurrency and local HTTP integration.

@@ -12,4 +12,4 @@ postman collection run api/course.postman_collection.json --no-report-events --i
 
 The first request creates a fresh idempotency key. Avoid concurrent manual mutations during the sequence. The local stores have a 1,000-item teaching limit; restart to reset. `GET /limited` is best explored manually because time-sensitive quota assertions would make the sequential collection brittle. Its atomic behavior is tested with a fake clock in SelfTest.
 
-The HTTP integration suite and collection were not run in the authoring environment because it blocks listening sockets. Run `sh scripts/test.sh` locally. JSON syntax and operation mapping were validated; compilation and core tests passed.
+The full Java test suite passed all 49 checks, including local HTTP integration, after listening sockets became available on 6 November 2026. Run `sh scripts/test.sh` locally to reproduce it. JSON syntax and operation mapping were also validated. The Postman collection itself has not been executed.

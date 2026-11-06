@@ -1,7 +1,7 @@
 VERIFICATION AND SCOPE — 6 November 2026
 
 PASS: JDK 21 compilation of all supplied Java sources.
-PASS: 30 core behavioral checks; see java-tests.txt.
+PASS: All 49 behavior checks, including concurrency and local HTTP integration; see java-tests.txt.
 PASS: All ten lab demonstrations; see lab-output.txt.
 PASS: API JSON syntax and 15 request/status mappings to the contract.
 PASS: Word file archive integrity and review of all 43 rendered pages.
@@ -9,8 +9,8 @@ PASS: Review of all ten video slides and an extracted encoded MP4 frame.
 PASS: Full combined MP4 audio/video decode completed with no reported errors.
 PASS: All ten source narration tracks contain non-silent audio.
 
-NOT RUN: HTTP integration tests, because the authoring environment blocks
-listening sockets. The full tests are included for execution locally.
+UPDATE: HTTP integration tests passed after local server access became
+available. The guide and video describe the earlier restricted authoring run.
 NOT RUN: Postman collection; the CLI status also failed with a keychain error.
 NOT RUN: PostgreSQL reference schema and extension transactions.
 External video links were discovered and checked against publisher pages;
