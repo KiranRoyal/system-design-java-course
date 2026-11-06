@@ -2,7 +2,7 @@
 
 A 16-week learning package for building systems, interview preparation, and production design reviews.
 
-Start with `docs/System_Design_with_Java.docx`. Watch `videos/System_Design_Java_Sample.mp4`, then use `videos/VIDEO_GUIDE.txt` for topic-specific lessons from original publishers.
+Start with the [Word course guide](docs/System_Design_with_Java.docx). Watch the [narrated sample video](videos/System_Design_Java_Sample.mp4), then use the [topic video guide](videos/VIDEO_GUIDE.txt) for lessons from original publishers. Browse the [Java source](src/course) and [lab workbook](docs/LAB_WORKBOOK.txt) alongside each lesson.
 
 ## Included
 

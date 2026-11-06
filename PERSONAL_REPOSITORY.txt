@@ -1,24 +1,24 @@
 PERSONAL GITHUB REPOSITORY
 
-Intended owner: KiranRoyal
-Intended repository: system-design-java-course
-Intended remote: https://github.com/KiranRoyal/system-design-java-course.git
+Owner: KiranRoyal
+Repository: system-design-java-course
+URL: https://github.com/KiranRoyal/system-design-java-course
+Visibility: Private
 
-This course is prepared for the personal account only. The remote URL is a
-configured destination; it does not establish that the repository exists or
-that the files have been uploaded.
+GitHub authentication was verified as KiranRoyal before publishing.
+Only this personal repository is used for the course.
 
 The local repository uses:
   user.name: KiranRoyal
   user.email: KiranRoyal@users.noreply.github.com
 
-This is a privacy-preserving noreply author address, not a verified sign-in.
-Account authentication must be checked separately before publishing.
 Repository-local configuration disables inherited Git credential helpers.
 The computer's global Git configuration has not been changed.
+No office account was used for this upload.
 
-Before publishing, connect GitHub using the KiranRoyal account and verify
-that the authenticated account is exactly KiranRoyal. Create a private
-repository by default if the intended repository does not yet exist.
-Include the Word guide, Java source, API examples, SQL references, and videos.
-Do not include build output, local credentials, or office repositories.
+The repository includes the Word guide, Java source, API examples,
+SQL references, videos, and recorded validation results. Generated build
+output and temporary document lock files are excluded.
+
+Latest validation: all 49 Java behavior checks passed, including
+concurrency and local HTTP integration. Run sh scripts/test.sh with JDK 21.
